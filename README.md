@@ -1,6 +1,16 @@
 Запуск проекта : npm run start:dev 
 Запуск faker.ts : npm run seed 
 
+
+Тестовый пользователь : 
+
+login : test
+password : 1111
+
+
+
+
+
 БД:  npx prisma studio   ( http://localhost:5555 ) 
 
 Хост базы данных на render.com 
