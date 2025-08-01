@@ -3,6 +3,7 @@
 
 - Запуск проекта : `npm run start:dev`
 - Запуск faker.ts : `npm run seed`
+- !! В файл .env `DATABASE_URL="postgresql://internship2_user:0umpFzHrq2yy5YMD8rHRgv6grsLmE77D@dpg-d23rdrfdiees739vjh4g-a.frankfurt-postgres.render.com/internship2?schema=public"`
 
 
 - Тестовый пользователь : 
