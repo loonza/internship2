@@ -1,5 +1,5 @@
-Запуск проекта : npm run start:dev 
-Запуск faker.ts : npm run seed 
+Запуск проекта : npm run start:dev __ 
+Запуск faker.ts : npm run seed __
 
 
 Тестовый пользователь : 
