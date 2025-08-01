@@ -1,6 +1,6 @@
 
 
-БД: 
+БД:  npx prisma studio   ( http://localhost:5555 ) 
 
 ![photo_2025-08-02 02 12 28](https://github.com/user-attachments/assets/7b21795b-2b31-44fb-a61a-ab1b84ba9ed5)
 
