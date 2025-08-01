@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>Создание группы</title>
+    <link rel="stylesheet" href="/public/css/styles.css" />
+</head>
+<body>
+<div id="main">
+    <div id="header">
+        <div>
+            <div style="font-size: 13px; color: #888;">Группы /</div>
+            <h2 style="margin: 0;">Создание группы</h2>
+        </div>
+    </div>
+
+    <form id="group-create-form" class="form-grid" style="max-width: 600px;
+margin: 32px auto;" method="POST" action="/groups/add">
+        <div class="form-group">
+            <label>Название</label>
+            <input type="text" name="name" required />
+        </div>
+
+        <div class="form-group">
+            <label>Описание</label>
+            <input type="text" name="description" />
+        </div>
+
+        <div class="form-group" style="grid-column: 1 / -1;">
+            <label>Комментарий</label>
+            <textarea name="comment" rows="6"></textarea>
+        </div>
+
+        <div style="grid-column: 1 / -1; text-align: center;">
+            <button type="submit" class="submit-button">Создать</button>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

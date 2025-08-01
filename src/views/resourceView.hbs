@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{resource.name}} - {{service.name}}</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #0066cc;
+        }
+        h2 {
+            font-size: 20px;
+            margin: 20px 0 10px;
+            color: #0066cc;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 10px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f5f5f5;
+            font-weight: normal;
+            color: #666;
+        }
+        .search-box {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .search-box label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .search-box input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 300px;
+            margin-right: 10px;
+        }
+        .search-box button {
+            padding: 8px 15px;
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .selected-values {
+            margin-top: 30px;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+        }
+        .remove-btn {
+            color: #cc0000;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .actions {
+            margin-top: 20px;
+        }
+        .actions button {
+            padding: 8px 15px;
+            margin-right: 10px;
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .form-row {
+            display: flex;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        .form-row select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 300px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Сервер Авторизации и лицензирования</h1>
+    <h2>Добавление прав доступа</h2>
+
+    <div class="form-row">
+        <label for="user-type">Пользователи:</label>
+        <select id="user-type">
+            <option value="">-- Выберите тип --</option>
+            <option value="groups">Группы</option>
+            <option value="roles">Роль</option>
+            <option value="internal">Внутренний</option>
+        </select>
+    </div>
+
+    <table id="access-table">
+        <thead>
+        <tr>
+            <th>Пользователи</th>
+            <th>Источник авторизации</th>
+            <th>Тип</th>
+            <th>Название</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#each accessList}}
+            <tr data-id="{{this.id}}">
+                <td>{{this.userType}}</td>
+                <td>{{this.source}}</td>
+                <td>{{this.type}}</td>
+                <td>{{this.name}}</td>
+            </tr>
+        {{/each}}
+        </tbody>
+    </table>
+
+    <div class="search-box">
+        <label for="search-input">Найти в списке</label>
+        <input type="text" id="search-input" placeholder="Введите название группы или имя пользователя">
+        <button id="search-btn">Найти</button>
+    </div>
+
+    <div class="selected-values">
+        <h3>Выбранные значения по всем источникам авторизации</h3>
+        <table id="selected-table">
+            <tbody>
+            {{#each selectedAccess}}
+                <tr data-id="{{this.id}}">
+                    <td>{{this.type}}</td>
+                    <td>{{this.name}}</td>
+                    <td><span class="remove-btn" onclick="removeAccess('{{this.id}}')">×</span></td>
+                </tr>
+            {{/each}}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="actions">
+        <button id="save-btn">Сохранить</button>
+        <button id="cancel-btn">Отмена</button>
+    </div>
+</div>
+
+<script>
+
+    document.getElementById('user-type').addEventListener('change', async function() {
+        const userType = this.value;
+        if (!userType) return;
+
+        try {
+            const response = await fetch(`/api/access?type=${userType}`);
+            const data = await response.json();
+
+            const tbody = document.querySelector('#access-table tbody');
+            tbody.innerHTML = data.map(item => `
+                <tr data-id="${item.id}">
+                    <td>${item.userType}</td>
+                    <td>${item.source}</td>
+                    <td>${item.type}</td>
+                    <td>${item.name}</td>
+                </tr>
+            `).join('');
+
+
+            document.querySelectorAll('#access-table tbody tr').forEach(row => {
+                row.addEventListener('click', function() {
+                    addSelectedAccess(this.dataset.id);
+                });
+            });
+        } catch (error) {
+            console.error('Ошибка загрузки данных:', error);
+        }
+    });
+
+
+    async function addSelectedAccess(accessId) {
+        try {
+            const response = await fetch(`/api/access/${accessId}`, {
+                method: 'POST'
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                const selectedTable = document.querySelector('#selected-table tbody');
+                const newRow = document.createElement('tr');
+                newRow.setAttribute('data-id', data.id);
+                newRow.innerHTML = `
+                    <td>${data.type}</td>
+                    <td>${data.name}</td>
+                    <td><span class="remove-btn" onclick="removeAccess('${data.id}')">×</span></td>
+                `;
+
+                if (selectedTable.querySelector('tr[data-id]')) {
+                    selectedTable.appendChild(newRow);
+                } else {
+                    selectedTable.innerHTML = '';
+                    selectedTable.appendChild(newRow);
+                }
+            }
+        } catch (error) {
+            console.error('Ошибка добавления доступа:', error);
+        }
+    }
+
+
+    async function removeAccess(accessId) {
+        if (!confirm('Удалить этот элемент?')) return;
+
+        try {
+            const response = await fetch(`/api/access/${accessId}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                document.querySelector(`tr[data-id="${accessId}"]`).remove();
+
+
+                const selectedTable = document.querySelector('#selected-table tbody');
+                if (selectedTable.children.length === 0) {
+                    selectedTable.innerHTML = '<tr><td colspan="3">Нет выбранных значений</td></tr>';
+                }
+            }
+        } catch (error) {
+            console.error('Ошибка удаления доступа:', error);
+        }
+    }
+
+
+    document.getElementById('search-btn').addEventListener('click', async function() {
+        const searchTerm = document.getElementById('search-input').value.trim();
+        if (!searchTerm) return;
+
+        try {
+            const response = await fetch(`/api/access/search?q=${encodeURIComponent(searchTerm)}`);
+            const data = await response.json();
+
+            const tbody = document.querySelector('#access-table tbody');
+            tbody.innerHTML = data.map(item => `
+                <tr data-id="${item.id}">
+                    <td>${item.userType}</td>
+                    <td>${item.source}</td>
+                    <td>${item.type}</td>
+                    <td>${item.name}</td>
+                </tr>
+            `).join('');
+
+
+            document.querySelectorAll('#access-table tbody tr').forEach(row => {
+                row.addEventListener('click', function() {
+                    addSelectedAccess(this.dataset.id);
+                });
+            });
+        } catch (error) {
+            console.error('Ошибка поиска:', error);
+        }
+    });
+
+
+    document.getElementById('save-btn').addEventListener('click', async function() {
+        try {
+            const selectedIds = Array.from(document.querySelectorAll('#selected-table tr[data-id]'))
+                    .map(row => row.dataset.id);
+
+            const response = await fetch('/api/access/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    resourceId: '{{resource.id}}',
+                    accessIds: selectedIds
+                })
+            });
+
+            if (response.ok) {
+                alert('Изменения сохранены');
+                window.location.reload();
+            }
+        } catch (error) {
+            console.error('Ошибка сохранения:', error);
+        }
+    });
+
+
+    document.getElementById('cancel-btn').addEventListener('click', function() {
+        if (confirm('Отменить все изменения?')) {
+            window.location.reload();
+        }
+    });
+</script>
+</body>
+</html>

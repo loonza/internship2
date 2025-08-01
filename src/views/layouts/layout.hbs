@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+    <style>
+        :root {
+            --sidebar-width: 300px;
+            --sidebar-bg: #2c3e50;
+            --sidebar-text: #ecf0f1;
+            --sidebar-active: #3498db;
+            --sidebar-hover: #34495e;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100%;
+        }
+
+        #sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            box-sizing: border-box;
+        }
+
+        #sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        #sidebar h2 {
+            color: var(--sidebar-text);
+            font-size: 18px;
+            margin-top: 0;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--sidebar-hover);
+        }
+
+        #sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        #sidebar ul li {
+            margin-bottom: 10px;
+        }
+
+        #sidebar ul li a {
+            color: var(--sidebar-text);
+            text-decoration: none;
+            display: block;
+            padding: 8px 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        #sidebar ul li a:hover {
+            background-color: var(--sidebar-hover);
+        }
+
+        #sidebar ul li a.active {
+            background-color: var(--sidebar-active);
+            font-weight: bold;
+        }
+
+        #footer-user {
+            padding: 15px 0;
+            border-top: 1px solid var(--sidebar-hover);
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--sidebar-bg);
+            position: sticky;
+            bottom: 0;
+        }
+
+        .logout-btn {
+            background: none;
+            border: none;
+            color: var(--sidebar-text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px;
+        }
+
+        .logout-btn:hover {
+            text-decoration: underline;
+        }
+
+        #main-content {
+            flex: 1;
+            padding: 20px;
+            background-color: #f5f5f5;
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+    </style>
+    {{{styles}}}
+</head>
+<body>
+<div id="sidebar">
+    <div id="sidebar-content">
+        <h2>СЕРВЕР АВТОРИЗАЦИИ И ЛИЦЕНЗИРОВАНИЯ</h2>
+        <ul>
+            <li><a href="/users" class="nav {{#if activeTab.users}}active{{/if}}">Пользователи</a></li>
+            <li><a href="/groups" class="nav {{#if activeTab.groups}}active{{/if}}">Группы</a></li>
+            <li><a href="/services" class="nav {{#if activeTab.services}}active{{/if}}">Сервисы и ресурсы</a></li>
+            <li><a href="#" class="nav {{#if activeTab.sources}}active{{/if}}">Источники авторизации</a></li>
+        </ul>
+    </div>
+
+    <div id="footer-user">
+        <span>{{user.lastName}} {{user.firstName}}</span>
+        <form action="/auth/logout" method="POST" style="display: inline;">
+            <button type="submit" class="logout-btn">
+                <span class="logout-icon"></span> Выход
+            </button>
+        </form>
+    </div>
+</div>
+
+<div id="main-content">
+    {{{body}}}
+</div>
+
+{{{scripts}}}
+</body>
+</html>

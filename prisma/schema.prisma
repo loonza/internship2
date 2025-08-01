@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String      @id @default(uuid())
+  login      String      @unique
+  email      String
+  password   String
+  prefix     String?
+  lastName   String
+  firstName  String
+  middleName String?
+  suffix     String?
+  department String?
+  division   String?
+  comment    String?
+  source     AuthSource?
+  groups     GroupUser[]
+}
+
+model Group {
+  id          String          @id @default(uuid())
+  name        String
+  description String?
+  source      AuthSource?
+  comment     String?
+  children    GroupRelation[] @relation("ChildGroups")
+  parents     GroupRelation[] @relation("ParentGroups")
+  users       GroupUser[]
+}
+
+model GroupUser {
+  id      String @id @default(uuid())
+  userId  String
+  groupId String
+  group   Group  @relation(fields: [groupId], references: [id])
+  user    User   @relation(fields: [userId], references: [id])
+}
+
+model GroupRelation {
+  id            String @id @default(uuid())
+  parentGroupId String
+  childGroupId  String
+  childGroup    Group  @relation("ChildGroups", fields: [childGroupId], references: [id])
+  parentGroup   Group  @relation("ParentGroups", fields: [parentGroupId], references: [id])
+}
+
+model Service {
+  id          String     @id @default(uuid())
+  name        String     @unique
+  description String?
+  enabled     Boolean    @default(true)
+  resources   Resource[]
+}
+
+model Resource {
+  id             String           @id @default(uuid())
+  name           String
+  description    String?
+  service        Service          @relation(fields: [serviceId], references: [id])
+  serviceId      String
+  ResourceAccess ResourceAccess[]
+}
+
+model Access {
+  id             String           @id @default(uuid())
+  userType       String
+  source         String
+  type           String
+  name           String
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  ResourceAccess ResourceAccess[]
+}
+
+model ResourceAccess {
+  id         String   @id @default(uuid())
+  resource   Resource @relation(fields: [resourceId], references: [id])
+  resourceId String
+  access     Access   @relation(fields: [accessId], references: [id])
+  accessId   String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([resourceId, accessId])
+}
+
+enum SubjectType {
+  USER
+  GROUP
+}
+
+enum AuthSource {
+  LOCAL
+  DOMAIN
+  ACTIVE_DIRECTORY
+  DOMAIN1
+  DOMAIN2
+  DOMAIN3
+}

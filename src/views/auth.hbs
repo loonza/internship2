@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>Вход</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body class="auth-page">
+<div class="auth-container">
+    <h2>Вход</h2>
+    {{#if error}}
+        <div class="alert alert-danger">{{error}}</div>
+    {{/if}}
+    <form method="POST" action="/auth/login">
+        <div class="form-group">
+            <label for="login">Логин</label>
+            <input type="text" id="login" name="login" required />
+        </div>
+        <div class="form-group">
+            <label for="password">Пароль</label>
+            <input type="password" id="password" name="password" required />
+        </div>
+        <div class="form-bottom">
+            <a href="/forgotPassword">Забыли пароль?</a>
+            <button type="submit" class="btn-primary">Войти</button>
+        </div>
+        <div class="remember-me">
+            <input type="checkbox" id="remember" name="remember" />
+            <label for="remember">Запомнить</label>
+        </div>
+    </form>
+</div>
+<footer>© АО «Кодекс», 2019. v0.0.1</footer>
+</body>
+</html>

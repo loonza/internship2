@@ -1,0 +1,96 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Профиль пользователя</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+<div id="main" style="padding: 32px; flex: 1;">
+    <div id="breadcrumb">
+        Группы / Департамент программных технологий / <b>{{user.name}}</b>
+    </div>
+    <h2>{{user.name}}</h2>
+    <div style="display: flex; gap: 16px; margin-bottom: 16px;">
+        <button class="tab active" data-tab="data">ДАННЫЕ</button>
+    </div>
+
+    <div id="tab-content">
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Логин</label>
+                <input disabled value="{{user.login}}">
+            </div>
+            <div class="form-group">
+                <label>E-mail</label>
+                <input disabled value="{{user.email}}">
+            </div>
+        </div>
+
+        <h4>Личные данные</h4>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Префикс</label>
+                <input disabled value="{{user.prefix}}">
+            </div>
+            <div class="form-group">
+                <label>Фамилия</label>
+                <input disabled value="{{user.lastname}}">
+            </div>
+            <div class="form-group">
+                <label>Имя</label>
+                <input disabled value="{{user.firstname}}">
+            </div>
+            <div class="form-group">
+                <label>Отчество</label>
+                <input disabled value="{{user.middlename}}">
+            </div>
+            <div class="form-group">
+                <label>Суффикс</label>
+                <input disabled value="{{user.suffix}}">
+            </div>
+        </div>
+
+        <h4>Служебная информация</h4>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Департамент</label>
+                <input disabled value="{{user.department}}">
+            </div>
+            <div class="form-group">
+                <label>Подразделение</label>
+                <input disabled value="{{user.subdivision}}">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const userGroups = {{json user.groups}};
+    const tabContent = document.getElementById("tab-content");
+
+    function renderGroups(groups) {
+        tabContent.innerHTML = groups.map(g => `<div style="margin-bottom: 8px;">${g}</div>`).join('');
+    }
+
+    function renderAccess() {
+        tabContent.innerHTML = `<div>Права доступа пока не реализованы</div>`;
+    }
+
+    function renderData() {
+        location.reload();
+    }
+
+    document.querySelectorAll('.tab').forEach(btn => {
+        btn.onclick = () => {
+            document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            if (btn.dataset.tab === 'groups') renderGroups(userGroups);
+            else if (btn.dataset.tab === 'access') renderAccess();
+            else renderData();
+        };
+    });
+</script>
+</body>
+</html>

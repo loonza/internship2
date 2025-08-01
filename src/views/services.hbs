@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Сервисы и ресурсы</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        #main {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        #header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            border-bottom: 1px solid #ddd;
+        }
+        #header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        #header > div {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        #search-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        #search-input {
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 200px;
+        }
+        .highlight {
+            background-color: yellow;
+        }
+        .suggestions {
+            position: absolute;
+            background: white;
+            border: 1px solid #ccc;
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 1000;
+            width: 200px;
+        }
+        .suggestion-item {
+            padding: 4px 8px;
+            cursor: pointer;
+        }
+        .suggestion-item:hover {
+            background-color: #f0f0f0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            text-align: left;
+            padding: 12px 16px;
+            border-bottom: 1px solid #ddd;
+            font-weight: normal;
+            color: #666;
+        }
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #eee;
+        }
+        .service-row {
+            cursor: pointer;
+        }
+        .service-row:hover {
+            background-color: #f5f5f5;
+        }
+        .service-disabled {
+            color: #999;
+            opacity: 0.7;
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .toggle-slider {
+            background-color: #0066cc;
+        }
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+        #pagination {
+            display: flex;
+            align-items: center;
+            padding: 16px 24px;
+            gap: 15px;
+            font-size: 14px;
+        }
+        #pagination a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+<div id="main">
+    <div id="header">
+        <h1>Сервисы и ресурсы</h1>
+        <div>
+            <div id="search-wrapper">
+                <input type="text" id="search-input" placeholder="Найти в списке" autocomplete="off" value="{{searchQuery}}">
+                <div id="suggestions" class="suggestions" hidden></div>
+            </div>
+        </div>
+    </div>
+
+    <div style="flex: 1; overflow-y: auto;">
+        <table>
+            <thead>
+            <tr>
+                <th>Название</th>
+                <th>Описание</th>
+                <th>Статус</th>
+            </tr>
+            </thead>
+            <tbody id="services-table-body">
+            {{#each services}}
+                <tr class="service-row {{#unless enabled}}service-disabled{{/unless}}" data-id="{{id}}">
+                    <td onclick="window.location.href='/services/view?name={{encodeURIComponent name}}'">{{name}}</td>
+                    <td onclick="window.location.href='/services/view?name={{encodeURIComponent name}}'">{{description}}</td>
+                    <td>
+                        <label class="toggle-switch">
+                            <input type="checkbox" {{#if enabled}}checked{{/if}} onclick="toggleService(event, '{{id}}')">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </td>
+                </tr>
+            {{/each}}
+            </tbody>
+        </table>
+    </div>
+
+    <div id="pagination">
+        {{#if (gt currentPage 1)}}
+            <a href="?page={{subtract currentPage 1}}&perPage={{perPage}}{{#if searchQuery}}&search={{searchQuery}}{{/if}}">&lt; Предыдущая</a>
+        {{/if}}
+        <span>Страница {{currentPage}} из {{totalPages}}</span>
+        {{#if (lt currentPage totalPages)}}
+            <a href="?page={{add currentPage 1}}&perPage={{perPage}}{{#if searchQuery}}&search={{searchQuery}}{{/if}}">Следующая &gt;</a>
+        {{/if}}
+        <span>На странице:</span>
+        <select id="per-page-select" onchange="changePerPage(this.value)">
+            <option value="10" {{#eq perPage 10}}selected{{/eq}}>10</option>
+            <option value="20" {{#eq perPage 20}}selected{{/eq}}>20</option>
+            <option value="50" {{#eq perPage 50}}selected{{/eq}}>50</option>
+            <option value="100" {{#eq perPage 100}}selected{{/eq}}>100</option>
+        </select>
+    </div>
+</div>
+
+<script>
+    const services = {{{json services}}};
+
+    function highlight(text, keyword) {
+        const regex = new RegExp(`(${keyword})`, 'gi');
+        return text.replace(regex, '<span class="highlight">$1</span>');
+    }
+
+    function renderTable(filteredServices, keyword = '') {
+        const tableBody = document.getElementById('services-table-body');
+
+        if (filteredServices.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="3">По запросу «${keyword}» ничего не найдено.<br><small>Попробуйте сократить запрос или задать его по-другому.</small></td></tr>`;
+            return;
+        }
+
+        tableBody.innerHTML = filteredServices.map(s => `
+            <tr class="service-row ${s.enabled ? '' : 'service-disabled'}" data-id="${s.id}">
+                <td onclick="window.location.href='/services/view?name=${encodeURIComponent(s.name)}'">
+                    ${keyword ? highlight(s.name, keyword) : s.name}
+                </td>
+                <td onclick="window.location.href='/services/view?name=${encodeURIComponent(s.name)}'">
+                    ${s.description}
+                </td>
+                <td>
+                    <label class="toggle-switch">
+                        <input type="checkbox" ${s.enabled ? 'checked' : ''} onclick="toggleService(event, '${s.id}')">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function filterServices(query) {
+        return services.filter(s =>
+                s.name.toLowerCase().includes(query.toLowerCase()) ||
+                (s.description && s.description.toLowerCase().includes(query.toLowerCase()))
+        );
+    }
+
+    const searchInput = document.getElementById('search-input');
+    const suggestions = document.getElementById('suggestions');
+
+    searchInput.addEventListener('input', () => {
+        const query = searchInput.value.trim();
+        const matches = filterServices(query);
+        renderTable(matches, query);
+
+        if (query.length > 0) {
+            suggestions.innerHTML = matches.map(s =>
+                    `<div class="suggestion-item" onclick="selectSuggestion('${s.name}')">
+                    ${highlight(s.name, query)}
+                </div>`
+            ).join('');
+            suggestions.hidden = matches.length === 0;
+        } else {
+            suggestions.hidden = true;
+            renderTable(services);
+        }
+    });
+
+    function selectSuggestion(name) {
+        const service = services.find(s => s.name === name);
+        if (service) {
+            searchInput.value = name;
+            suggestions.hidden = true;
+            renderTable([service]);
+            const row = document.querySelector(`[data-id="${service.id}"]`);
+            if (row) {
+                row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+    }
+
+    document.addEventListener('click', e => {
+        if (!e.target.closest('#search-wrapper')) {
+            suggestions.hidden = true;
+        }
+    });
+
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            const url = new URL(window.location.href);
+            url.searchParams.set('search', this.value);
+            url.searchParams.set('page', '1');
+            window.location.href = url.toString();
+        }
+    });
+
+    async function toggleService(event, serviceId) {
+        event.stopPropagation();
+        const checkbox = event.target;
+        const row = checkbox.closest('.service-row');
+
+        try {
+            const response = await fetch(`/services/${serviceId}/toggle`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                if (result.enabled) {
+                    row.classList.remove('service-disabled');
+                } else {
+                    row.classList.add('service-disabled');
+                }
+            } else {
+
+                checkbox.checked = !checkbox.checked;
+            }
+        } catch (error) {
+            console.error('Error toggling service:', error);
+            checkbox.checked = !checkbox.checked;
+        }
+    }
+
+    function changePerPage(perPage) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('perPage', perPage);
+        url.searchParams.set('page', '1');
+        window.location.href = url.toString();
+    }
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+        renderTable(services);
+        {{#if searchQuery}}
+            searchInput.value = '{{searchQuery}}';
+            const matches = filterServices('{{searchQuery}}');
+            renderTable(matches, '{{searchQuery}}');
+        {{/if}}
+    });
+</script>
+</body>
+</html>
