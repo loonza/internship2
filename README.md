@@ -1,3 +1,6 @@
+
+# Authorization service
+
 - Запуск проекта : `npm run start:dev`
 - Запуск faker.ts : `npm run seed`
 
