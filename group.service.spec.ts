@@ -4,11 +4,6 @@ import { GroupService } from '../src/group/group.service';
 import { PrismaService } from '../src/prisma.service';
 import { faker } from '@faker-js/faker/locale/ru';
 import { Group, AuthSource } from '@prisma/client';
-import sinonChai from 'sinon-chai';
-import chai from 'chai';
-
-
-chai.use(sinonChai);
 
 describe('GroupService', () => {
     let groupService: GroupService;
@@ -17,12 +12,13 @@ describe('GroupService', () => {
 
     beforeEach(() => {
         sandbox = sinon.createSandbox();
-
         prisma = {
             group: {
                 findMany: sandbox.stub(),
                 create: sandbox.stub(),
-                findUnique: sandbox.stub()
+                findUnique: sandbox.stub(),
+                update: sandbox.stub(),
+                delete: sandbox.stub()
             }
         } as unknown as PrismaService;
 
@@ -34,7 +30,7 @@ describe('GroupService', () => {
     });
 
     describe('getAll()', () => {
-        it('should return groups ordered by name', async () => {
+        it('Возвращает группы ( сортировка по названию ) ', async () => {
             const mockGroups: Group[] = [
                 {
                     id: faker.string.uuid(),
@@ -58,15 +54,15 @@ describe('GroupService', () => {
             const result = await groupService.getAll();
 
             expect(result).to.deep.equal(mockGroups);
-            expect(findManyStub).to.have.been.calledOnce;
-            expect(findManyStub).to.have.been.calledWith({
+            expect(findManyStub.calledOnce).to.be.true;
+            expect(findManyStub.calledWith({
                 orderBy: { name: 'asc' }
-            });
+            })).to.be.true;
         });
     });
 
     describe('createGroup()', () => {
-        it('should create new group with all fields', async () => {
+        it('Создание группы', async () => {
             const groupData = {
                 name: 'New Group',
                 description: 'Description',
@@ -85,11 +81,10 @@ describe('GroupService', () => {
             const result = await groupService.createGroup(groupData);
 
             expect(result).to.deep.equal(createdGroup);
-            expect(createStub).to.have.been.calledOnce;
-            expect(createStub).to.have.been.calledWith({
+            expect(createStub.calledOnce).to.be.true;
+            expect(createStub.calledWith({
                 data: groupData
-            });
+            })).to.be.true;
         });
     });
 });
-

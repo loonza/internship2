@@ -12,6 +12,9 @@
     "esModuleInterop": true,
     "strict": true,
     "baseUrl": "./",
+    "paths": {
+      "src/*": ["src/*"]
+    },
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
