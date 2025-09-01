@@ -22,7 +22,7 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
-    "types": ["mocha", "chai", "sinon", "sinon-chai", "node"]
+    "types": ["mocha", "chai", "sinon", "node"]
   },
   "include": ["src/**/*", "test/**/*"]
 }
