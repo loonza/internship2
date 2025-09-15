@@ -1,7 +1,21 @@
-import {Controller, Get, Post, Body, Render, Req, Res, Query, Param, NotFoundException} from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Post,
+    Body,
+    Render,
+    Req,
+    Res,
+    Query,
+    Param,
+    NotFoundException,
+    Put,
+    Delete
+} from '@nestjs/common';
 import {Request, Response} from 'express';
 import {UserService} from './user.service';
 import {ApiExcludeController} from "@nestjs/swagger";
+import {UpdateUserDto} from "src/user/dto/update-user.dto";
 
 @ApiExcludeController()
 @Controller('users')
@@ -44,6 +58,7 @@ export class UserController {
             user: req.session.user
         };
     }
+
     @Get(':id/access-rights')
     async getUserAccessRights(@Param('id') id: string) {
         return this.userService.getUserAccessRights(id);
@@ -65,6 +80,7 @@ export class UserController {
     async getUserGroups(@Param('id') id: string) {
         return this.userService.getUserGroups(id);
     }
+
     @Get(':id')
     @Render('user')
     async getUserProfile(@Param('id') id: string) {
@@ -73,7 +89,6 @@ export class UserController {
         if (!user) {
             throw new NotFoundException('Пользователь не найден');
         }
-
 
         return {
             user: {
@@ -88,8 +103,32 @@ export class UserController {
                 suffix: user.suffix,
                 department: user.department,
                 subdivision: user.division,
-                groups: await this.userService.getUserGroups(id)
+                groups: await this.userService.getUserGroups(id) // Теперь возвращает объекты с id и name
             }
         };
+    }
+
+    @Put(':id')
+    async updateUser(
+        @Param('id') id: string,
+        @Body() updateUserDto: UpdateUserDto,
+        @Res() res: Response
+    ) {
+        try {
+            await this.userService.updateUser(id, updateUserDto);
+            res.status(200).json({message: 'Пользователь обновлен'});
+        } catch (error) {
+            res.status(400).json({error: 'Ошибка при обновлении пользователя'});
+        }
+    }
+
+    @Delete(':id')
+    async deleteUser(@Param('id') id: string, @Res() res: Response) {
+        try {
+            await this.userService.deleteUser(id);
+            res.status(200).json({message: 'Пользователь удален'});
+        } catch (error) {
+            res.status(400).json({error: 'Ошибка при удалении пользователя'});
+        }
     }
 }

@@ -20,15 +20,16 @@ import {
     ApiQuery,
     ApiBearerAuth,
 } from '@nestjs/swagger';
-import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import {UserService} from './user.service';
+import {CreateUserDto} from './dto/create-user.dto';
+import {UpdateUserDto} from './dto/update-user.dto';
 
 @ApiTags('Users')
 @ApiBearerAuth()
 @Controller('api/users')
 export class UserApiController {
-    constructor(private readonly userService: UserService) {}
+    constructor(private readonly userService: UserService) {
+    }
 
     @Get()
     @ApiOperation({
@@ -63,7 +64,7 @@ export class UserApiController {
         @Query('search') search?: string
     ) {
         try {
-            const { users, totalCount } = await this.userService.getPaginatedUsers(
+            const {users, totalCount} = await this.userService.getPaginatedUsers(
                 page,
                 perPage,
                 search
@@ -90,8 +91,8 @@ export class UserApiController {
     }
 
     @Post()
-    @ApiOperation({ summary: 'Создать нового пользователя' })
-    @ApiBody({ type: CreateUserDto })
+    @ApiOperation({summary: 'Создать нового пользователя'})
+    @ApiBody({type: CreateUserDto})
     @ApiResponse({
         status: 201,
         description: 'Пользователь успешно создан',
@@ -113,7 +114,7 @@ export class UserApiController {
     }
 
     @Get(':id')
-    @ApiOperation({ summary: 'Получить информацию о пользователе' })
+    @ApiOperation({summary: 'Получить информацию о пользователе'})
     @ApiParam({
         name: 'id',
         description: 'UUID пользователя',
@@ -147,8 +148,9 @@ export class UserApiController {
             }
         };
     }
+
     @Get(':id/access-rights')
-    @ApiOperation({ summary: 'Получить права доступа пользователя' })
+    @ApiOperation({summary: 'Получить права доступа пользователя'})
     @ApiParam({
         name: 'id',
         description: 'UUID пользователя',
@@ -174,7 +176,7 @@ export class UserApiController {
     }
 
     @Get(':id/groups')
-    @ApiOperation({ summary: 'Получить группы пользователя' })
+    @ApiOperation({summary: 'Получить группы пользователя'})
     @ApiParam({
         name: 'id',
         description: 'UUID пользователя',
@@ -196,13 +198,13 @@ export class UserApiController {
     }
 
     @Put(':id')
-    @ApiOperation({ summary: 'Обновить информацию о пользователе' })
+    @ApiOperation({summary: 'Обновить информацию о пользователе'})
     @ApiParam({
         name: 'id',
         description: 'UUID пользователя',
         example: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
     })
-    @ApiBody({ type: UpdateUserDto })
+    @ApiBody({type: UpdateUserDto})
     @ApiResponse({
         status: 200,
         description: 'Информация о пользователе обновлена',
@@ -228,7 +230,7 @@ export class UserApiController {
 
     @Delete(':id')
     @HttpCode(204)
-    @ApiOperation({ summary: 'Удалить пользователя' })
+    @ApiOperation({summary: 'Удалить пользователя'})
     @ApiParam({
         name: 'id',
         description: 'UUID пользователя',

@@ -1,95 +1,378 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Профиль пользователя</title>
-    <link rel="stylesheet" href="/css/styles.css" />
+    <title>{{user.name}}</title>
+    <link rel="stylesheet" href="/css/styles.css"/>
+    <style>
+
+        #main {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        #header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #header h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .breadcrumb {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .tab-bar {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            padding: 0 24px;
+        }
+
+        .tab {
+            padding: 8px 16px;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+        }
+
+        .tab.active {
+            border-bottom-color: #0066cc;
+            font-weight: bold;
+        }
+
+        #tab-content {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            max-width: 600px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 4px;
+            color: #666;
+        }
+
+        .form-group input, .form-group textarea {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .submit-button {
+            padding: 8px 16px;
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .submit-button:hover {
+            background-color: #0052a3;
+        }
+
+        .delete-button {
+            padding: 8px 16px;
+            background-color: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .delete-button:hover {
+            background-color: #cc0000;
+        }
+
+        .confirmation-dialog {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .dialog-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            width: 400px;
+        }
+
+        .dialog-buttons {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+            gap: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th {
+            text-align: left;
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+            font-weight: normal;
+            color: #666;
+        }
+
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+    </style>
 </head>
 <body>
-<div id="main" style="padding: 32px; flex: 1;">
-    <div id="breadcrumb">
-        Группы / Департамент программных технологий / <b>{{user.name}}</b>
+<div id="main">
+    <div id="header">
+        <div>
+            <div class="breadcrumb">Пользователи /</div>
+            <h2>{{user.name}}</h2>
+        </div>
     </div>
-    <h2>{{user.name}}</h2>
-    <div style="display: flex; gap: 16px; margin-bottom: 16px;">
-        <button class="tab active" data-tab="data">ДАННЫЕ</button>
+
+    <div class="tab-bar">
+        <button class="tab active" data-tab="profile">ПРОФИЛЬ</button>
+        <button class="tab" data-tab="groups">ГРУППЫ</button>
     </div>
 
     <div id="tab-content">
-        <div class="form-grid">
-            <div class="form-group">
-                <label>Логин</label>
-                <input disabled value="{{user.login}}">
-            </div>
-            <div class="form-group">
-                <label>E-mail</label>
-                <input disabled value="{{user.email}}">
-            </div>
+        <div class="tab-section" id="profile-tab">
+            <form id="user-form" class="form-grid">
+                <div class="form-group">
+                    <label>Логин</label>
+                    <input type="text" name="login" value="{{user.login}}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" value="{{user.email}}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Фамилия</label>
+                    <input type="text" name="lastName" value="{{user.lastname}}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Имя</label>
+                    <input type="text" name="firstName" value="{{user.firstname}}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Отчество</label>
+                    <input type="text" name="middleName" value="{{user.middlename}}">
+                </div>
+
+                <div class="form-group">
+                    <label>Департамент</label>
+                    <input type="text" name="department" value="{{user.department}}">
+                </div>
+
+                <div class="form-group">
+                    <label>Подразделение</label>
+                    <input type="text" name="division" value="{{user.subdivision}}">
+                </div>
+
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label>Комментарий</label>
+                    <textarea name="comment">{{user.comment}}</textarea>
+                </div>
+
+                <div style="display:flex; justify-content: space-between; grid-column: 1 / -1;">
+                    <button type="button" id="delete-button" class="delete-button">Удалить пользователя</button>
+                    <button type="submit" class="submit-button">Сохранить</button>
+                </div>
+            </form>
         </div>
 
-        <h4>Личные данные</h4>
-        <div class="form-grid">
-            <div class="form-group">
-                <label>Префикс</label>
-                <input disabled value="{{user.prefix}}">
-            </div>
-            <div class="form-group">
-                <label>Фамилия</label>
-                <input disabled value="{{user.lastname}}">
-            </div>
-            <div class="form-group">
-                <label>Имя</label>
-                <input disabled value="{{user.firstname}}">
-            </div>
-            <div class="form-group">
-                <label>Отчество</label>
-                <input disabled value="{{user.middlename}}">
-            </div>
-            <div class="form-group">
-                <label>Суффикс</label>
-                <input disabled value="{{user.suffix}}">
-            </div>
+        <div class="tab-section" id="groups-tab" style="display:none;">
+            <h3>Группы пользователя</h3>
+            <table>
+                <thead>
+                <tr>
+                    <th>Название группы</th>
+                    <th>Действия</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{#each user.groups}}
+                    <tr>
+                        <td>{{this.name}}</td>
+                        <td>
+                            <button class="action-button delete-group-btn"
+                                    data-group-id="{{this.id}}"
+                                    data-group-name="{{this.name}}">
+                                Удалить из группы
+                            </button>
+                        </td>
+                    </tr>
+                {{else}}
+                    <tr>
+                        <td colspan="2">Пользователь не состоит в группах</td>
+                    </tr>
+                {{/each}}
+                </tbody>
+            </table>
         </div>
+    </div>
+</div>
 
-        <h4>Служебная информация</h4>
-        <div class="form-grid">
-            <div class="form-group">
-                <label>Департамент</label>
-                <input disabled value="{{user.department}}">
-            </div>
-            <div class="form-group">
-                <label>Подразделение</label>
-                <input disabled value="{{user.subdivision}}">
-            </div>
+<div id="confirmation-dialog" class="confirmation-dialog">
+    <div class="dialog-content">
+        <h3>Подтверждение удаления</h3>
+        <p>Вы действительно хотите удалить пользователя "{{user.name}}"?</p>
+        <div class="dialog-buttons">
+            <button id="cancel-delete" class="submit-button">Отмена</button>
+            <button id="confirm-delete" class="delete-button">Удалить</button>
         </div>
     </div>
 </div>
 
 <script>
-    const userGroups = {{json user.groups}};
-    const tabContent = document.getElementById("tab-content");
-
-    function renderGroups(groups) {
-        tabContent.innerHTML = groups.map(g => `<div style="margin-bottom: 8px;">${g}</div>`).join('');
-    }
-
-    function renderAccess() {
-        tabContent.innerHTML = `<div>Права доступа пока не реализованы</div>`;
-    }
-
-    function renderData() {
-        location.reload();
-    }
 
     document.querySelectorAll('.tab').forEach(btn => {
         btn.onclick = () => {
-            document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             btn.classList.add('active');
-            if (btn.dataset.tab === 'groups') renderGroups(userGroups);
-            else if (btn.dataset.tab === 'access') renderAccess();
-            else renderData();
+
+            document.getElementById('profile-tab').style.display =
+                    btn.dataset.tab === 'profile' ? 'block' : 'none';
+            document.getElementById('groups-tab').style.display =
+                    btn.dataset.tab === 'groups' ? 'block' : 'none';
         };
+    });
+
+
+    document.getElementById('user-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        const data = {
+            login: formData.get('login'),
+            email: formData.get('email'),
+            lastName: formData.get('lastName'),
+            firstName: formData.get('firstName'),
+            middleName: formData.get('middleName'),
+            department: formData.get('department'),
+            division: formData.get('division'),
+            comment: formData.get('comment')
+        };
+
+        try {
+            const response = await fetch(`/users/{{user.id}}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                alert('Данные сохранены успешно');
+                window.location.reload();
+            } else {
+                alert('Ошибка при сохранении данных');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Ошибка при сохранении данных');
+        }
+    });
+
+
+    const deleteButton = document.getElementById('delete-button');
+    const confirmationDialog = document.getElementById('confirmation-dialog');
+    const cancelDelete = document.getElementById('cancel-delete');
+    const confirmDelete = document.getElementById('confirm-delete');
+
+    deleteButton.addEventListener('click', () => {
+        confirmationDialog.style.display = 'flex';
+    });
+
+    cancelDelete.addEventListener('click', () => {
+        confirmationDialog.style.display = 'none';
+    });
+
+    confirmDelete.addEventListener('click', async () => {
+        try {
+            const response = await fetch(`/users/{{user.id}}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                window.location.href = '/users';
+            } else {
+                alert('Ошибка при удалении пользователя');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Ошибка при удалении пользователя');
+        }
+    });
+
+
+    document.addEventListener('click', async (e) => {
+        if (e.target.classList.contains('delete-group-btn')) {
+            const groupId = e.target.dataset.groupId;
+            const groupName = e.target.dataset.groupName;
+
+            if (confirm(`Вы уверены, что хотите удалить пользователя из группы "${groupName}"?`)) {
+                try {
+                    const response = await fetch(`/groups/${groupId}/users/{{user.id}}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (response.ok) {
+                        alert('Пользователь удален из группы');
+                        window.location.reload();
+                    } else {
+                        const errorData = await response.json();
+                        alert('Ошибка при удалении из группы: ' + (errorData.error || 'Неизвестная ошибка'));
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Ошибка при удалении из группы');
+                }
+            }
+        }
     });
 </script>
 </body>

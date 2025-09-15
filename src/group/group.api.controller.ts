@@ -11,7 +11,7 @@ import {
     NotFoundException,
     BadRequestException,
 } from '@nestjs/common';
-import { GroupService } from './group.service';
+import {GroupService} from './group.service';
 import {
     ApiTags,
     ApiOperation,
@@ -21,14 +21,15 @@ import {
     ApiQuery,
     ApiBearerAuth,
 } from '@nestjs/swagger';
-import { CreateGroupDto } from './dto/create-group.dto';
-import { UpdateGroupDto } from './dto/update-group.dto';
+import {CreateGroupDto} from './dto/create-group.dto';
+import {UpdateGroupDto} from './dto/update-group.dto';
 
 @ApiTags('Groups')
 @ApiBearerAuth()
 @Controller('api/groups')
 export class GroupApiController {
-    constructor(private readonly groupService: GroupService) {}
+    constructor(private readonly groupService: GroupService) {
+    }
 
     @Get()
     @ApiOperation({
@@ -69,14 +70,12 @@ export class GroupApiController {
         try {
             const groups = await this.groupService.getAll();
 
-            // Фильтрация
             const filteredGroups = search
                 ? groups.filter(g =>
                     g.name.toLowerCase().includes(search.toLowerCase()) ||
                     (g.description && g.description.toLowerCase().includes(search.toLowerCase())))
                 : groups;
 
-            // Пагинация
             const startIndex = (page - 1) * perPage;
             const paginatedGroups = filteredGroups.slice(startIndex, startIndex + perPage);
 
@@ -95,8 +94,8 @@ export class GroupApiController {
     }
 
     @Post()
-    @ApiOperation({ summary: 'Создать новую группу' })
-    @ApiBody({ type: CreateGroupDto })
+    @ApiOperation({summary: 'Создать новую группу'})
+    @ApiBody({type: CreateGroupDto})
     @ApiResponse({
         status: 201,
         description: 'Группа успешно создана',
@@ -118,7 +117,7 @@ export class GroupApiController {
     }
 
     @Get(':id')
-    @ApiOperation({ summary: 'Получить информацию о группе' })
+    @ApiOperation({summary: 'Получить информацию о группе'})
     @ApiParam({
         name: 'id',
         description: 'UUID группы',
@@ -141,7 +140,7 @@ export class GroupApiController {
     }
 
     @Get(':id/members')
-    @ApiOperation({ summary: 'Получить список участников группы' })
+    @ApiOperation({summary: 'Получить список участников группы'})
     @ApiParam({
         name: 'id',
         description: 'UUID группы',
@@ -165,20 +164,20 @@ export class GroupApiController {
             ...(group.users || []).map(u =>
                 `${u.user.lastName} ${u.user.firstName} ${u.user.middleName || ''}`.trim()
             ),
-            ...(group.children || []).map(g => g.childGroup.name)
+            ...(group.parentGroups || []).map(g => g.childGroup.name)
         ];
 
-        return { members };
+        return {members};
     }
 
     @Put(':id')
-    @ApiOperation({ summary: 'Обновить информацию о группе' })
+    @ApiOperation({summary: 'Обновить информацию о группе'})
     @ApiParam({
         name: 'id',
         description: 'UUID группы',
         example: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
     })
-    @ApiBody({ type: UpdateGroupDto })
+    @ApiBody({type: UpdateGroupDto})
     @ApiResponse({
         status: 200,
         description: 'Информация о группе обновлена',
@@ -204,7 +203,7 @@ export class GroupApiController {
 
     @Delete(':id')
     @HttpCode(204)
-    @ApiOperation({ summary: 'Удалить группу' })
+    @ApiOperation({summary: 'Удалить группу'})
     @ApiParam({
         name: 'id',
         description: 'UUID группы',

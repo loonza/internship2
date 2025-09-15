@@ -3,13 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <title>{{service.name}}</title>
-    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/styles.css"/>
     <style>
+
+
+        .access-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .access-controls select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-width: 200px;
+        }
+
+        .access-search {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .access-search input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 250px;
+        }
+
+        .access-search button {
+            padding: 8px 16px;
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .access-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .access-table th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .access-table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .access-table tr:hover {
+            background-color: #f9f9f9;
+            cursor: pointer;
+        }
+
+        .selected-access {
+            margin-top: 30px;
+            border-top: 2px solid #ddd;
+            padding-top: 20px;
+        }
+
+        .selected-access h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .selected-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .selected-table th {
+            background-color: #e6f2ff;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .selected-table td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .remove-btn {
+            color: #cc0000;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            padding: 5px 10px;
+        }
+
+        .remove-btn:hover {
+            color: #ff0000;
+        }
+
+        .access-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+
+        .cancel-button {
+            padding: 8px 16px;
+            background-color: #f5f5f5;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .cancel-button:hover {
+            background-color: #e5e5e5;
+        }
+
         #main {
             display: flex;
             flex-direction: column;
             height: 100vh;
         }
+
         #header {
             display: flex;
             justify-content: space-between;
@@ -17,69 +139,329 @@
             padding: 16px 24px;
             border-bottom: 1px solid #ddd;
         }
+
         #header h2 {
             margin: 0;
             font-size: 20px;
         }
+
         .breadcrumb {
             font-size: 13px;
             color: #888;
-            margin-bottom: 4px;
         }
+
         .tab-bar {
             display: flex;
             border-bottom: 1px solid #ddd;
             padding: 0 24px;
         }
+
         .tab {
             padding: 8px 16px;
             background: none;
             border: none;
             border-bottom: 2px solid transparent;
             cursor: pointer;
-            font-weight: bold;
-            color: #666;
         }
+
         .tab.active {
             border-bottom-color: #0066cc;
-            color: #0066cc;
+            font-weight: bold;
         }
+
         #tab-content {
             flex: 1;
             padding: 24px;
             overflow-y: auto;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
         }
+
         th {
             text-align: left;
-            padding: 12px 16px;
+            padding: 8px;
             border-bottom: 1px solid #ddd;
             font-weight: normal;
             color: #666;
         }
+
         td {
-            padding: 12px 16px;
+            padding: 8px;
             border-bottom: 1px solid #eee;
         }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            max-width: 600px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 4px;
+            color: #666;
+        }
+
+        .form-group input, .form-group textarea {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .submit-button {
+            padding: 8px 16px;
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .submit-button:hover {
+            background-color: #0052a3;
+        }
+
+        .delete-button {
+            padding: 8px 16px;
+            background-color: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .delete-button:hover {
+            background-color: #cc0000;
+        }
+
+        .confirmation-dialog {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .dialog-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            width: 400px;
+        }
+
+        .dialog-buttons {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+            gap: 10px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .action-button {
+            padding: 4px 8px;
+            background: none;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .action-button:hover {
+            background-color: #f5f5f5;
+        }
+
         .resource-row {
             cursor: pointer;
         }
+
         .resource-row:hover {
             background-color: #f5f5f5;
         }
-        #pagination {
+
+
+        .access-controls {
             display: flex;
-            align-items: center;
-            padding: 16px 24px;
             gap: 15px;
-            font-size: 14px;
+            margin-bottom: 20px;
+            align-items: center;
+            flex-wrap: wrap;
         }
-        #pagination a {
-            color: #0066cc;
+
+        .access-controls select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-width: 200px;
+        }
+
+        .access-search {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .access-search input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 250px;
+        }
+
+        .access-search button {
+            padding: 8px 16px;
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .access-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .access-table th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .access-table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .access-table tr:hover {
+            background-color: #f9f9f9;
+            cursor: pointer;
+        }
+
+        .selected-access {
+            margin-top: 30px;
+            border-top: 2px solid #ddd;
+            padding-top: 20px;
+        }
+
+        .selected-access h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .selected-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .selected-table th {
+            background-color: #e6f2ff;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .selected-table td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .remove-btn {
+            color: #cc0000;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            padding: 5px 10px;
+        }
+
+        .remove-btn:hover {
+            color: #ff0000;
+        }
+
+        .access-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+
+        .cancel-button {
+            padding: 8px 16px;
+            background-color: #f5f5f5;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .cancel-button:hover {
+            background-color: #e5e5e5;
+        }
+
+        #add-resource-button {
+            background: #006eff;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 4px;
+            cursor: pointer;
             text-decoration: none;
+            display: inline-block;
         }
     </style>
 </head>
@@ -87,8 +469,11 @@
 <div id="main">
     <div id="header">
         <div>
-            <div class="breadcrumb">Сервисы и ресурсы /</div>
+            <div class="breadcrumb">Сервисы и ресурсы / {{service.name}}</div>
             <h2>{{service.name}}</h2>
+        </div>
+        <div>
+            <button id="add-resource-button">Добавить ресурс</button>
         </div>
     </div>
 
@@ -99,55 +484,546 @@
     </div>
 
     <div id="tab-content">
-        <table>
-            <thead>
-            <tr>
-                <th>Ресурс</th>
-                <th>Описание</th>
-            </tr>
-            </thead>
-            <tbody>
-            {{#each service.resources}}
-                <tr class="resource-row" onclick="window.location.href='/resource-view?name={{encodeURIComponent name}}'">
-                <td>{{name}}</td>
-                <td>{{description}}</td>
-                </tr>
-            {{else}}
+        <div class="tab-section" id="resources-tab">
+            <table>
+                <thead>
                 <tr>
-                    <td colspan="2">Нет ресурсов</td>
+                    <th>Ресурс</th>
+                    <th>Описание</th>
+                    <th>Действия</th>
                 </tr>
-            {{/each}}
-            </tbody>
-        </table>
-    </div>
+                </thead>
+                <tbody>
+                {{#each service.resources}}
+                    <tr class="resource-row">
+                        <td>
+                            {{name}}
+                        </td>
+                        <td>
+                            {{description}}
+                        </td>
+                        <td>
+                            <button class="action-button delete-resource-btn"
+                                    data-id="{{id}}"
+                                    data-name="{{name}}">
+                                Удалить
+                            </button>
+                        </td>
+                    </tr>
+                {{else}}
+                    <tr>
+                        <td colspan="3">Нет ресурсов</td>
+                    </tr>
+                {{/each}}
+                </tbody>
+            </table>
+        </div>
 
-    <div id="pagination">
-        <span>Страница 1 из 1</span>
-        <span>На странице:</span>
-        <select onchange="changePerPage(this.value)">
-            <option value="10">10</option>
-            <option value="20">20</option>
-            <option value="50" selected>50</option>
-            <option value="100">100</option>
-        </select>
+        <div class="tab-section" id="access-tab" style="display:none;">
+            <div class="access-info">
+                <h3>Текущие права доступа сервиса</h3>
+                <p>Сервис имеет {{selectedAccess.length}} прав доступа, распределенных по {{service.resources.length}}
+                    ресурсам</p>
+            </div>
+            <div class="current-access">
+                <h4>Текущие права доступа</h4>
+                <table class="access-table">
+                    <thead>
+                    <tr>
+                        <th>Тип пользователя</th>
+                        <th>Источник</th>
+                        <th>Тип доступа</th>
+                        <th>Название</th>
+                        <th>Действие</th>
+                    </tr>
+                    </thead>
+                    <tbody id="current-access-table">
+                    {{#each selectedAccess}}
+                        <tr data-id="{{this.id}}">
+                            <td>{{this.userType}}</td>
+                            <td>{{this.source}}</td>
+                            <td>{{this.type}}</td>
+                            <td>{{this.name}}</td>
+                            <td>
+                                <button class="action-button remove-access-btn"
+                                        data-id="{{this.id}}"
+                                        data-name="{{this.name}}">
+                                    Удалить
+                                </button>
+                            </td>
+                        </tr>
+                    {{else}}
+                        <tr>
+                            <td colspan="5">Нет назначенных прав доступа</td>
+                        </tr>
+                    {{/each}}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="access-controls">
+                <div>
+                    <label for="user-type">Тип пользователя:</label>
+                    <select id="user-type">
+                        <option value="">-- Все типы --</option>
+                        <option value="GROUP">Группы</option>
+                        <option value="USER">Внутренние пользователи</option>
+                    </select>
+                </div>
+
+                <div class="access-search">
+                    <input type="text" id="access-search" placeholder="Поиск по названию...">
+                    <button id="search-access-btn">Найти</button>
+                </div>
+            </div>
+
+            <table class="access-table">
+                <thead>
+                <tr>
+                    <th>Тип</th>
+                    <th>Источник авторизации</th>
+                    <th>Категория</th>
+                    <th>Название</th>
+                </tr>
+                </thead>
+                <tbody id="access-table-body">
+                <tr>
+                    <td colspan="4">Выберите тип пользователя или введите поисковый запрос</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="selected-access">
+                <h3>Выбранные права доступа</h3>
+                <table class="selected-table">
+                    <thead>
+                    <tr>
+                        <th>Тип</th>
+                        <th>Название</th>
+                        <th>Действие</th>
+                    </tr>
+                    </thead>
+                    <tbody id="selected-table">
+                    {{#each selectedAccess}}
+                        <tr data-id="{{this.id}}">
+                            <td>{{this.type}}</td>
+                            <td>{{this.name}}</td>
+                            <td><span class="remove-btn" onclick="removeAccess('{{this.id}}')">×</span></td>
+                        </tr>
+                    {{else}}
+                        <tr>
+                            <td colspan="3">Нет выбранных прав доступа</td>
+                        </tr>
+                    {{/each}}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="access-actions">
+                <button id="cancel-access-btn" class="cancel-button">Отмена</button>
+                <button id="save-access-btn" class="submit-button">Сохранить права доступа</button>
+            </div>
+        </div>
+
+
+        <div class="tab-section" id="props-tab" style="display:none;">
+            <form id="service-form" class="form-grid">
+                <div class="form-group">
+                    <label>Название сервиса</label>
+                    <input type="text" name="name" value="{{service.name}}" required>
+                </div>
+                <div class="form-group">
+                    <label>Статус</label>
+                    <div>
+                        <label>
+                            <input type="checkbox" name="enabled" {{#if service.enabled}}checked{{/if}}>
+                            Сервис активен
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label>Описание</label>
+                    <textarea name="description">{{service.description}}</textarea>
+                </div>
+                <div style="display:flex; justify-content: space-between; grid-column: 1 / -1;">
+                    <button type="button" id="delete-button" class="delete-button">Удалить сервис</button>
+                    <button type="submit" class="submit-button">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div id="add-resource-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Добавить ресурс</h3>
+            <button id="close-modal" style="background: none; border: none; font-size: 18px; cursor: pointer;">×
+            </button>
+        </div>
+
+        <form id="add-resource-form">
+            <div class="form-group">
+                <label for="resource-name">Название ресурса *</label>
+                <input type="text" id="resource-name" name="name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="resource-description">Описание</label>
+                <textarea id="resource-description" name="description"></textarea>
+            </div>
+
+            <div class="modal-buttons">
+                <button type="button" id="cancel-add-resource" class="cancel-button">Отмена</button>
+                <button type="submit" class="submit-button">Добавить</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div id="confirmation-dialog" class="confirmation-dialog">
+    <div class="dialog-content">
+        <h3>Подтверждение удаления</h3>
+        <p id="confirmation-message">Вы действительно хотите удалить этот сервис?</p>
+        <div class="dialog-buttons">
+            <button id="cancel-delete" class="submit-button">Отмена</button>
+            <button id="confirm-delete" class="delete-button">Удалить</button>
+        </div>
     </div>
 </div>
 
 <script>
-    document.querySelectorAll('.tab').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const tab = btn.dataset.tab;
 
+    document.querySelectorAll('.tab').forEach(btn => {
+        btn.onclick = () => {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             btn.classList.add('active');
-        });
+
+            document.querySelectorAll('.tab-section').forEach(section => {
+                section.style.display = 'none';
+            });
+
+            document.getElementById(`${btn.dataset.tab}-tab`).style.display = 'block';
+        };
     });
 
-    function changePerPage(perPage) {
-        const url = new URL(window.location.href);
-        url.searchParams.set('perPage', perPage);
-        window.location.href = url.toString();
+
+    document.getElementById('service-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        const data = {
+            name: formData.get('name'),
+            description: formData.get('description'),
+            enabled: formData.get('enabled') === 'on'
+        };
+
+        try {
+            const response = await fetch(`/services/{{service.id}}/update`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                alert('Ошибка при сохранении изменений');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Ошибка при сохранении изменений');
+        }
+    });
+
+
+    const deleteButton = document.getElementById('delete-button');
+    const confirmationDialog = document.getElementById('confirmation-dialog');
+    const cancelDelete = document.getElementById('cancel-delete');
+    const confirmDelete = document.getElementById('confirm-delete');
+    const confirmationMessage = document.getElementById('confirmation-message');
+
+    deleteButton.addEventListener('click', () => {
+        confirmationMessage.textContent = 'Вы действительно хотите удалить сервис "{{service.name}}"?';
+        confirmationDialog.style.display = 'flex';
+    });
+
+    cancelDelete.addEventListener('click', () => {
+        confirmationDialog.style.display = 'none';
+    });
+
+    confirmDelete.addEventListener('click', async () => {
+        try {
+            const response = await fetch(`/services/{{service.id}}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                window.location.href = '/services';
+            } else {
+                alert('Ошибка при удалении сервиса');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Ошибка при удалении сервиса');
+        }
+    });
+
+
+    const addResourceButton = document.getElementById('add-resource-button');
+    const resourceModal = document.getElementById('add-resource-modal');
+    const closeModal = document.getElementById('close-modal');
+    const cancelAddResource = document.getElementById('cancel-add-resource');
+    const addResourceForm = document.getElementById('add-resource-form');
+
+    addResourceButton.addEventListener('click', () => {
+        resourceModal.style.display = 'flex';
+    });
+
+    closeModal.addEventListener('click', () => {
+        resourceModal.style.display = 'none';
+        addResourceForm.reset();
+    });
+
+    cancelAddResource.addEventListener('click', () => {
+        resourceModal.style.display = 'none';
+        addResourceForm.reset();
+    });
+
+    addResourceForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(addResourceForm);
+        const data = {
+            name: formData.get('name'),
+            description: formData.get('description'),
+            serviceId: '{{service.id}}'
+        };
+
+        try {
+            const response = await fetch('/resources/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                resourceModal.style.display = 'none';
+                addResourceForm.reset();
+                alert('Ресурс успешно добавлен');
+                location.reload();
+            } else {
+                const error = await response.json();
+                alert(`Ошибка при добавлении ресурса: ${error.message || 'Неизвестная ошибка'}`);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Ошибка при добавлении ресурса');
+        }
+    });
+
+
+    document.addEventListener('click', async (e) => {
+        if (e.target.classList.contains('delete-resource-btn')) {
+            const resourceId = e.target.dataset.id;
+            const resourceName = e.target.dataset.name;
+
+            if (confirm(`Вы уверены, что хотите удалить ресурс "${resourceName}"?`)) {
+                try {
+                    const response = await fetch(`/resources/${resourceId}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert('Ошибка при удалении ресурса');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Ошибка при удалении ресурса');
+                }
+            }
+        }
+    });
+
+
+    document.getElementById('user-type').addEventListener('change', loadAccessList);
+    document.getElementById('search-access-btn').addEventListener('click', loadAccessList);
+    document.getElementById('access-search').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            loadAccessList();
+        }
+    });
+
+    async function loadAccessList() {
+        const userType = document.getElementById('user-type').value;
+        const searchTerm = document.getElementById('access-search').value.trim();
+
+        try {
+            let url = '/api/access';
+            const params = new URLSearchParams();
+
+            if (userType) {
+                params.append('type', userType);
+            }
+            if (searchTerm) {
+                params.append('q', searchTerm);
+            }
+
+            if (params.toString()) {
+                url += '?' + params.toString();
+            }
+
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error('Ошибка загрузки данных');
+            }
+
+            const data = await response.json();
+
+            const tbody = document.querySelector('#access-table-body');
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4">Ничего не найдено</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.map(item => `
+            <tr data-id="${item.id}" style="cursor: pointer;">
+                <td>${item.userType || 'Не указан'}</td>
+                <td>${item.source || 'Не указан'}</td>
+                <td>${item.type || 'Не указан'}</td>
+                <td>${item.name || 'Без названия'}</td>
+            </tr>
+        `).join('');
+
+
+            document.querySelectorAll('#access-table-body tr').forEach(row => {
+                row.addEventListener('click', function () {
+                    const accessId = this.dataset.id;
+                    const accessName = this.querySelector('td:last-child').textContent;
+                    const accessType = this.querySelector('td:nth-child(3)').textContent;
+
+                    addSelectedAccess(accessId, accessName, accessType);
+                });
+            });
+        } catch (error) {
+            console.error('Ошибка загрузки данных:', error);
+            const tbody = document.querySelector('#access-table-body');
+            tbody.innerHTML = '<tr><td colspan="4">Ошибка загрузки данных</td></tr>';
+        }
     }
+
+    async function addSelectedAccess(accessId, accessName, accessType) {
+        try {
+
+            const existingAccess = document.querySelector(`#selected-table tr[data-id="${accessId}"]`);
+            if (existingAccess) {
+                alert('Этот доступ уже добавлен');
+                return;
+            }
+
+            const selectedTable = document.querySelector('#selected-table');
+
+
+            if (selectedTable.querySelector('td[colspan]')) {
+                selectedTable.innerHTML = '';
+            }
+
+            const newRow = document.createElement('tr');
+            newRow.setAttribute('data-id', accessId);
+            newRow.innerHTML = `
+            <td>${accessType}</td>
+            <td>${accessName}</td>
+            <td><span class="remove-btn" onclick="removeAccess('${accessId}')">×</span></td>
+        `;
+
+            selectedTable.appendChild(newRow);
+
+        } catch (error) {
+            console.error('Ошибка добавления доступа:', error);
+            alert('Ошибка при добавлении доступа');
+        }
+    }
+
+    async function removeAccess(accessId) {
+        if (!confirm('Удалить этот элемент из выбранных?')) return;
+
+        const row = document.querySelector(`#selected-table tr[data-id="${accessId}"]`);
+        if (row) {
+            row.remove();
+
+            const selectedTable = document.querySelector('#selected-table');
+            if (selectedTable.children.length === 0) {
+                selectedTable.innerHTML = '<tr><td colspan="3">Нет выбранных прав доступа</td></tr>';
+            }
+        }
+    }
+
+    document.getElementById('save-access-btn').addEventListener('click', async function () {
+        try {
+            const selectedIds = Array.from(document.querySelectorAll('#selected-table tr[data-id]'))
+                    .map(row => row.dataset.id);
+
+            if (selectedIds.length === 0) {
+                alert('Не выбрано ни одного права доступа');
+                return;
+            }
+
+            const resources = {{{json service.resources}}};
+            let successCount = 0;
+
+            for (const resource of resources) {
+                try {
+                    const response = await fetch('/api/resources/save', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            resourceId: resource.id,
+                            accessIds: selectedIds
+                        })
+                    });
+
+                    if (response.ok) {
+                        successCount++;
+                    } else {
+                        console.error(`Ошибка для ресурса ${resource.name}:`, await response.text());
+                    }
+                } catch (error) {
+                    console.error(`Ошибка для ресурса ${resource.name}:`, error);
+                }
+            }
+
+            if (successCount === resources.length) {
+                alert('Права доступа успешно сохранены для всех ресурсов сервиса');
+                window.location.reload();
+            } else {
+                alert(`Права доступа сохранены для ${successCount} из ${resources.length} ресурсов. Проверьте консоль для деталей.`);
+            }
+
+        } catch (error) {
+            console.error('Ошибка сохранения:', error);
+            alert('Ошибка при сохранении прав доступа');
+        }
+    });
+    document.getElementById('cancel-access-btn').addEventListener('click', function () {
+        if (confirm('Отменить все изменения в правах доступа?')) {
+            window.location.reload();
+        }
+    });
+
+
+    document.querySelector('[data-tab="access"]').addEventListener('click', function () {
+        setTimeout(loadAccessList, 100);
+    });
 </script>
 </body>
 </html>

@@ -1,6 +1,6 @@
-import { faker } from '@faker-js/faker';
-import { PrismaClient, User, Group, Service, Resource, Access } from '@prisma/client';
-import { exit } from 'node:process';
+import {faker} from '@faker-js/faker';
+import {PrismaClient, User, Group, Service, Resource, Access} from '@prisma/client';
+import {exit} from 'node:process';
 
 const prisma = new PrismaClient();
 
@@ -22,8 +22,8 @@ async function main() {
 
         const user = await prisma.user.create({
             data: {
-                login: faker.internet.userName({ firstName, lastName }),
-                email: faker.internet.email({ firstName, lastName }),
+                login: faker.internet.userName({firstName, lastName}),
+                email: faker.internet.email({firstName, lastName}),
                 password: faker.internet.password(),
                 lastName,
                 firstName,
@@ -60,7 +60,7 @@ async function main() {
 
 
     for (const user of allUsers) {
-        const randomGroups = faker.helpers.arrayElements(groups, faker.number.int({ min: 1, max: 3 }));
+        const randomGroups = faker.helpers.arrayElements(groups, faker.number.int({min: 1, max: 3}));
         for (const group of randomGroups) {
             await prisma.groupUser.create({
                 data: {
@@ -86,10 +86,10 @@ async function main() {
 
     const serviceNames = new Set<string>();
     const services: Service[] = await Promise.all(
-        Array.from({ length: 10 }).map(async () => {
+        Array.from({length: 10}).map(async () => {
             let name;
             do {
-                name = `${faker.company.buzzNoun()} Service ${faker.number.int({ min: 1, max: 100 })}`;
+                name = `${faker.company.buzzNoun()} Service ${faker.number.int({min: 1, max: 100})}`;
             } while (serviceNames.has(name));
 
             serviceNames.add(name);
@@ -107,7 +107,7 @@ async function main() {
 
     const allResources: Resource[] = [];
     for (const service of services) {
-        const resourceCount = faker.number.int({ min: 1, max: 5 });
+        const resourceCount = faker.number.int({min: 1, max: 5});
         for (let i = 0; i < resourceCount; i++) {
             const resource = await prisma.resource.create({
                 data: {
@@ -121,7 +121,7 @@ async function main() {
     }
 
     for (const user of allUsers) {
-        const userResources = faker.helpers.arrayElements(allResources, faker.number.int({ min: 1, max: 3 }));
+        const userResources = faker.helpers.arrayElements(allResources, faker.number.int({min: 1, max: 3}));
 
         const access = await prisma.access.create({
             data: {
@@ -144,7 +144,7 @@ async function main() {
 
 
     for (const group of groups) {
-        const groupResources = faker.helpers.arrayElements(allResources, faker.number.int({ min: 1, max: 5 }));
+        const groupResources = faker.helpers.arrayElements(allResources, faker.number.int({min: 1, max: 5}));
 
         const access = await prisma.access.create({
             data: {

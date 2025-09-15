@@ -10,7 +10,8 @@ import {
     NotFoundException,
     Delete,
     Put,
-    Query
+    Query,
+    HttpCode
 } from '@nestjs/common';
 import {GroupService} from './group.service';
 import {Response, Request} from 'express';
@@ -82,20 +83,30 @@ export class GroupController {
             throw new NotFoundException('Группа не найдена');
         }
 
+        const members = [
+            ...(group.users || []).map(u => ({
+                id: u.user.id,
+                type: 'user',
+                name: `${u.user.lastName} ${u.user.firstName} ${u.user.middleName || ''}`.trim()
+            })),
+            ...(group.parentGroups || []).map(relation => ({
+                id: relation.childGroup.id,
+                type: 'group',
+                name: relation.childGroup.name
+            }))
+        ];
+
+
+        console.log('Final members count:', members.length);
+
         return {
             group: {
-                ...group,
-                members: [
-                    ...(group.users || []).map(u => ({
-                        type: 'пользователь',
-                        name: `${u.user.lastName} ${u.user.firstName} ${u.user.middleName || ''}`.trim()
-                    })),
-                    ...(group.children || []).map(g => ({
-                        type: 'группа',
-                        name: g.childGroup.name
-                    }))
-                ],
-                source: group.source || 'Локальная'
+                id: group.id,
+                name: group.name,
+                description: group.description,
+                source: group.source || 'Локальная',
+                comment: group.comment,
+                members: members
             },
             user: req.session.user
         };
@@ -108,15 +119,72 @@ export class GroupController {
             throw new NotFoundException('Группа не найдена');
         }
 
-
         const members = [
             ...(group.users || []).map(u =>
                 `${u.user.lastName} ${u.user.firstName} ${u.user.middleName || ''}`.trim()
             ),
-            ...(group.children || []).map(g => g.childGroup.name)
+            ...(group.parentGroups || []).map(relation => relation.childGroup.name)
         ];
 
         return members;
+    }
+
+    @Post(':id/members')
+    async addMember(
+        @Param('id') id: string,
+        @Body() body: { memberType: string; userId?: string; groupId?: string },
+        @Res() res: Response
+    ) {
+        try {
+            if (body.memberType === 'user' && body.userId) {
+                await this.groupService.addUserToGroup(id, body.userId);
+            } else if (body.memberType === 'group' && body.groupId) {
+                await this.groupService.addGroupToGroup(id, body.groupId);
+            } else {
+                throw new Error('Неверные параметры запроса');
+            }
+
+            res.redirect(`/groups/${id}`);
+        } catch (error) {
+            console.error('Error adding member:', error);
+            res.status(400).redirect(`/groups/${id}?error=Не удалось добавить участника`);
+        }
+    }
+
+    @Delete(':id/members')
+    async removeMember(
+        @Param('id') id: string,
+        @Body() body: { memberType: string; memberId: string },
+        @Res() res: Response
+    ) {
+        console.log(body);
+        try {
+            if (body.memberType === 'user') {
+                await this.groupService.removeUserFromGroup(id, body.memberId);
+            } else if (body.memberType === 'group') {
+                await this.groupService.removeGroupFromGroup(id, body.memberId);
+            }
+
+            res.status(200).send('Участник удален');
+        } catch (error) {
+            console.error('Error removing member:', error);
+            res.status(400).send('Не удалось удалить участника');
+        }
+    }
+
+    @Delete(':groupId/users/:userId')
+    async removeUserFromGroup(
+        @Param('groupId') groupId: string,
+        @Param('userId') userId: string,
+        @Res() res: Response
+    ) {
+        try {
+            await this.groupService.removeUserFromGroup(groupId, userId);
+            res.status(200).json({message: 'Пользователь удален из группы'});
+        } catch (error) {
+            console.error('Error removing user from group:', error);
+            res.status(400).json({error: 'Не удалось удалить пользователя из группы'});
+        }
     }
 
     @Put(':id')
@@ -126,12 +194,46 @@ export class GroupController {
         @Res() res: Response
     ) {
         await this.groupService.updateGroup(id, body);
-        res.redirect(`/groups`);
+        res.redirect(`/groups/${id}`);
     }
 
     @Delete(':id')
     async deleteGroup(@Param('id') id: string, @Res() res: Response) {
         await this.groupService.deleteGroup(id);
         res.redirect('/groups');
+    }
+
+    @Get('api/users')
+    @HttpCode(200)
+    async getUsers(@Query('search') search?: string) {
+        const users = await this.groupService.getUsers();
+
+        if (search) {
+            const searchLower = search.toLowerCase();
+            return users.filter(u =>
+                u.lastName.toLowerCase().includes(searchLower) ||
+                u.firstName.toLowerCase().includes(searchLower) ||
+                (u.middleName && u.middleName.toLowerCase().includes(searchLower)) ||
+                u.email.toLowerCase().includes(searchLower)
+            );
+        }
+
+        return users;
+    }
+
+    @Get('api/groups/exclude/:id')
+    @HttpCode(200)
+    async getGroupsExcluding(@Param('id') id: string, @Query('search') search?: string) {
+        const groups = await this.groupService.getGroupsExcluding(id);
+
+        if (search) {
+            const searchLower = search.toLowerCase();
+            return groups.filter(g =>
+                g.name.toLowerCase().includes(searchLower) ||
+                (g.description && g.description.toLowerCase().includes(searchLower))
+            );
+        }
+
+        return groups;
     }
 }

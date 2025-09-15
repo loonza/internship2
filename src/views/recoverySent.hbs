@@ -1,26 +1,26 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8"/>
     <title>Письмо отправлено</title>
-    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/styles.css"/>
 </head>
 <body class="auth-body">
 <div class="auth-container">
     <h2>Восстановление пароля</h2>
     <p style="margin-top: 16px;">
-        На <b>{{email}}</b> было отправлено письмо<br />
+        На <b>{{email}}</b> было отправлено письмо<br/>
         с инструкцией по восстановлению пароля.
     </p>
     <form method="POST" action="/auth/resend">
-        <input type="hidden" name="email" value="{{email}}" />
+        <input type="hidden" name="email" value="{{email}}"/>
         <button type="submit" class="btn-secondary">Отправить еще раз</button>
     </form>
 </div>
 
 <footer style="margin-top: 24px; text-align: center; font-size: 12px; color: #999;">
-    © АО «Кодекс», 2019. <br />
-    Положение по обработке и защите персональных данных<br />
+    © АО «Кодекс», 2019. <br/>
+    Положение по обработке и защите персональных данных<br/>
     v0.0.1
 </footer>
 </body>

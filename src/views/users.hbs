@@ -11,10 +11,12 @@
             align-items: center;
             margin-bottom: 20px;
         }
+
         #header h1 {
             margin: 0;
             font-size: 24px;
         }
+
         #header > div {
             display: flex;
             align-items: center;
@@ -25,13 +27,18 @@
             position: relative;
             display: inline-block;
         }
+
         #search-input {
             padding: 6px 12px;
             border: 1px solid #ddd;
             border-radius: 4px;
             width: 200px;
         }
-        .highlight { background-color: yellow; }
+
+        .highlight {
+            background-color: yellow;
+        }
+
         .suggestions {
             position: absolute;
             background: white;
@@ -41,10 +48,12 @@
             z-index: 1000;
             width: 200px;
         }
+
         .suggestion-item {
             padding: 4px 8px;
             cursor: pointer;
         }
+
         .suggestion-item:hover {
             background-color: #f0f0f0;
         }
@@ -53,6 +62,7 @@
             width: 100%;
             border-collapse: collapse;
         }
+
         th {
             text-align: left;
             padding: 8px;
@@ -60,15 +70,18 @@
             font-weight: normal;
             color: #666;
         }
+
         td {
             padding: 8px;
             border-bottom: 1px solid #eee;
         }
+
         .tabs {
             display: flex;
             border-bottom: 1px solid #ddd;
             margin-bottom: 0;
         }
+
         .tab-button {
             padding: 8px 16px;
             background: none;
@@ -77,38 +90,45 @@
             cursor: pointer;
             font-size: 14px;
         }
+
         .tab-button.active {
             border-bottom-color: #0066cc;
             font-weight: bold;
         }
+
         .tab-content {
             padding: 20px;
             background: #f9f9f9;
             border-left: 1px solid #ddd;
             min-height: 200px;
         }
+
         .access-right-item {
             margin-bottom: 10px;
             padding: 12px;
             background: white;
             border-radius: 4px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
+
         .access-right-item h4 {
             margin: 0 0 5px 0;
             color: #333;
         }
+
         .access-right-item p {
             margin: 0;
             color: #666;
             font-size: 13px;
         }
+
         #groups-list div {
             margin-bottom: 8px;
             padding: 8px;
             background: white;
             border-radius: 4px;
         }
+
         #pagination {
             display: flex;
             align-items: center;
@@ -116,26 +136,28 @@
             gap: 15px;
             font-size: 14px;
         }
+
         #pagination a {
             color: #0066cc;
             text-decoration: none;
         }
+
         .user-row:hover {
             background-color: #f5f5f5;
             cursor: pointer;
         }
-        .user-selected {
-            background-color: #e6f2ff;
-        }
+
         .user-name-link {
             display: block;
             text-decoration: none;
             color: inherit;
             padding: 8px;
         }
+
         .user-name-link:hover {
             text-decoration: underline;
         }
+
         #user-details-panel {
             width: 350px;
             margin-left: 30px;
@@ -149,9 +171,12 @@
     <div id="header">
         <h1>Пользователи</h1>
         <div>
-            <a href="/addUser"><button id="add-button">Добавить</button></a>
+            <a href="/addUser">
+                <button id="add-button">Добавить</button>
+            </a>
             <div id="search-wrapper">
-                <input type="text" id="search-input" placeholder="Найти в списке" autocomplete="off" value="{{searchQuery}}">
+                <input type="text" id="search-input" placeholder="Найти в списке" autocomplete="off"
+                       value="{{searchQuery}}">
                 <div id="suggestions" class="suggestions" hidden></div>
             </div>
         </div>
@@ -211,11 +236,13 @@
 
     <div id="pagination">
         {{#if (gt currentPage 1)}}
-            <a href="?page={{subtract currentPage 1}}&perPage={{perPage}}{{#if searchQuery}}&search={{searchQuery}}{{/if}}">&lt; Предыдущая</a>
+            <a href="?page={{subtract currentPage 1}}&perPage={{perPage}}{{#if searchQuery}}
+            &search={{searchQuery}}{{/if}}">&lt; Предыдущая</a>
         {{/if}}
         <span>Страница {{currentPage}} из {{totalPages}}</span>
         {{#if (lt currentPage totalPages)}}
-            <a href="?page={{add currentPage 1}}&perPage={{perPage}}{{#if searchQuery}}&search={{searchQuery}}{{/if}}">Следующая &gt;</a>
+            <a href="?page={{add currentPage 1}}&perPage={{perPage}}{{#if searchQuery}}
+            &search={{searchQuery}}{{/if}}">Следующая &gt;</a>
         {{/if}}
         <span>На странице:</span>
         <select id="per-page-select" onchange="changePerPage(this.value)">
@@ -256,7 +283,7 @@
         `).join('');
 
         document.querySelectorAll('.user-row').forEach(row => {
-            row.addEventListener('click', function(e) {
+            row.addEventListener('click', function (e) {
                 if (!e.target.closest('.user-name-link')) {
                     const userId = this.getAttribute('data-user-id');
                     showUserDetails(userId, this);
@@ -298,7 +325,7 @@
             renderTable([user]);
             const row = document.querySelector(`[data-user-id="${user.id}"]`);
             if (row) {
-                row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                row.scrollIntoView({behavior: 'smooth', block: 'nearest'});
                 document.querySelectorAll('.user-row').forEach(r => r.classList.remove('user-selected'));
                 row.classList.add('user-selected');
                 showUserDetails(user.id, row);
@@ -310,7 +337,7 @@
         if (!e.target.closest('#search-wrapper')) suggestions.hidden = true;
     });
 
-    searchInput.addEventListener('keypress', function(e) {
+    searchInput.addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {
             const url = new URL(window.location.href);
             url.searchParams.set('search', this.value);
@@ -352,7 +379,11 @@
         const groupsList = document.getElementById('groups-list');
         if (groups && groups.length > 0) {
             groupsList.innerHTML = groups.map(group =>
-                    `<div>${group}</div>`
+                    `<div>
+                <a href="/groups/${group.id}" style="text-decoration: none; color: inherit;">
+                    ${group.name}
+                </a>
+            </div>`
             ).join('');
         } else {
             groupsList.innerHTML = '<div>Пользователь не состоит в группах</div>';

@@ -152,6 +152,108 @@
             margin-top: 20px;
             gap: 10px;
         }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        .modal-tabs {
+            display: flex;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .modal-tab {
+            padding: 8px 16px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+
+        .modal-tab.active {
+            border-bottom-color: #0066cc;
+            font-weight: bold;
+        }
+
+        .search-container {
+            margin-bottom: 15px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .items-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .item-row {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+
+        .item-row:hover {
+            background-color: #f5f5f5;
+        }
+
+        .item-row.selected {
+            background-color: #e6f2ff;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .action-button {
+            padding: 4px 8px;
+            background: none;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .action-button:hover {
+            background-color: #f5f5f5;
+        }
     </style>
 </head>
 <body>
@@ -179,17 +281,35 @@
                 <tr>
                     <th>Тип</th>
                     <th>Название</th>
+                    <th>Действия</th>
                 </tr>
                 </thead>
                 <tbody>
                 {{#each group.members}}
                     <tr>
                         <td>{{this.type}}</td>
-                        <td>{{this.name}}</td>
+                        <td>
+                            {{#if (eq this.type 'user')}}
+                                <a href="/users/{{this.id}}" style="text-decoration: none; color: inherit;">
+                                    {{this.name}}
+                                </a>
+                            {{else}}
+                                <a href="/groups/{{this.id}}" style="text-decoration: none; color: inherit;">
+                                    {{this.name}}
+                                </a>
+                            {{/if}}
+                        </td>
+                        <td>
+                            <button class="action-button delete-member-btn"
+                                    data-type="{{this.type}}"
+                                    data-id="{{this.id}}">
+                                Удалить
+                            </button>
+                        </td>
                     </tr>
                 {{else}}
                     <tr>
-                        <td colspan="2">Нет участников</td>
+                        <td colspan="3">Нет участников</td>
                     </tr>
                 {{/each}}
                 </tbody>
@@ -223,6 +343,34 @@
     </div>
 </div>
 
+<div id="add-member-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Добавить участника</h3>
+            <button id="close-modal" style="background: none; border: none; font-size: 18px; cursor: pointer;">×
+            </button>
+        </div>
+
+        <div class="modal-tabs">
+            <button class="modal-tab active" data-type="user">Пользователи</button>
+            <button class="modal-tab" data-type="group">Группы</button>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="member-search" class="search-input" placeholder="Поиск...">
+        </div>
+
+        <div class="items-list" id="items-list">
+            <div class="item-row">Загрузка...</div>
+        </div>
+
+        <div class="modal-buttons">
+            <button id="cancel-add" class="cancel-button">Отмена</button>
+            <button id="confirm-add" class="submit-button">Добавить</button>
+        </div>
+    </div>
+</div>
+
 <div id="confirmation-dialog" class="confirmation-dialog">
     <div class="dialog-content">
         <h3>Подтверждение удаления</h3>
@@ -247,7 +395,6 @@
         };
     });
 
-
     document.getElementById('group-form').addEventListener('submit', async function (e) {
         e.preventDefault();
 
@@ -258,7 +405,6 @@
             comment: formData.get('comment')
         };
 
-
         await fetch(`/groups/{{group.id}}`, {
             method: 'PUT',
             headers: {
@@ -267,11 +413,8 @@
             body: JSON.stringify(data)
         });
 
-
-
-
+        window.location.reload();
     });
-
 
     const deleteButton = document.getElementById('delete-button');
     const confirmationDialog = document.getElementById('confirmation-dialog');
@@ -290,10 +433,158 @@
         await fetch(`/groups/{{group.id}}`, {
             method: 'DELETE'
         });
+        window.location.href = '/groups';
+    });
 
 
-    })
-    ;
+    const addButton = document.getElementById('add-button');
+    const modal = document.getElementById('add-member-modal');
+    const closeModal = document.getElementById('close-modal');
+    const cancelAdd = document.getElementById('cancel-add');
+    const confirmAdd = document.getElementById('confirm-add');
+    const memberSearch = document.getElementById('member-search');
+    const itemsList = document.getElementById('items-list');
+    const modalTabs = document.querySelectorAll('.modal-tab');
+
+    let currentTab = 'user';
+    let selectedItem = null;
+
+    addButton.addEventListener('click', () => {
+        modal.style.display = 'flex';
+        loadItems(currentTab);
+    });
+
+    closeModal.addEventListener('click', () => {
+        modal.style.display = 'none';
+        resetModal();
+    });
+
+    cancelAdd.addEventListener('click', () => {
+        modal.style.display = 'none';
+        resetModal();
+    });
+
+    modalTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            modalTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            currentTab = tab.dataset.type;
+            loadItems(currentTab);
+        });
+    });
+
+    memberSearch.addEventListener('input', () => {
+        loadItems(currentTab, memberSearch.value);
+    });
+
+    confirmAdd.addEventListener('click', async () => {
+        if (!selectedItem) {
+            alert('Выберите участника для добавления');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/groups/{{group.id}}/members`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    memberType: currentTab,
+                    [currentTab === 'user' ? 'userId' : 'groupId']: selectedItem.id
+                })
+            });
+
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Ошибка при добавлении участника');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Ошибка при добавлении участника');
+        }
+    });
+
+    function resetModal() {
+        memberSearch.value = '';
+        selectedItem = null;
+        itemsList.innerHTML = '<div class="item-row">Загрузка...</div>';
+    }
+
+    async function loadItems(type, search = '') {
+        try {
+            const endpoint = type === 'user'
+                    ? `/groups/api/users${search ? `?search=${encodeURIComponent(search)}` : ''}`
+                    : `/groups/api/groups/exclude/{{group.id}}${search ? `?search=${encodeURIComponent(search)}` : ''}`;
+
+            const response = await fetch(endpoint);
+            const data = await response.json();
+
+            itemsList.innerHTML = '';
+
+            if (data.length === 0) {
+                itemsList.innerHTML = '<div class="item-row">Ничего не найдено</div>';
+                return;
+            }
+
+            data.forEach(item => {
+                const row = document.createElement('div');
+                row.className = 'item-row';
+                row.dataset.id = item.id;
+
+                if (type === 'user') {
+                    row.textContent = `${item.lastName} ${item.firstName} ${item.middleName || ''}`.trim();
+                    if (item.email) {
+                        row.textContent += ` (${item.email})`;
+                    }
+                } else {
+                    row.textContent = item.name;
+                    if (item.description) {
+                        row.textContent += ` (${item.description})`;
+                    }
+                }
+
+                row.addEventListener('click', () => {
+                    document.querySelectorAll('.item-row').forEach(r => r.classList.remove('selected'));
+                    row.classList.add('selected');
+                    selectedItem = item;
+                });
+
+                itemsList.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Error loading items:', error);
+            itemsList.innerHTML = '<div class="item-row">Ошибка загрузки</div>';
+        }
+    }
+
+    document.addEventListener('click', async (e) => {
+        if (e.target.classList.contains('delete-member-btn')) {
+            const type = e.target.dataset.type;
+            const id = e.target.dataset.id;
+
+            if (confirm('Вы уверены, что хотите удалить этого участника?')) {
+                try {
+                    await fetch(`/groups/{{group.id}}/members`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            memberType: type,
+                            memberId: id
+                        })
+                    });
+
+                    location.reload();
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Ошибка при удалении участника');
+                }
+            }
+        }
+    });
 </script>
 </body>
 </html>

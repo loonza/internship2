@@ -1,7 +1,7 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { NestExpressApplication } from '@nestjs/platform-express';
-import { join } from 'path';
+import {NestFactory} from '@nestjs/core';
+import {AppModule} from './app.module';
+import {NestExpressApplication} from '@nestjs/platform-express';
+import {join} from 'path';
 import * as hbs from 'express-handlebars';
 import * as express from 'express';
 import session from 'express-session';
@@ -35,14 +35,14 @@ async function bootstrap() {
 
     app.useStaticAssets(join(__dirname, '..', 'public'));
 
-    app.use(express.urlencoded({ extended: true }));
+    app.use(express.urlencoded({extended: true}));
 
     app.use(
         session({
             secret: 'loonza',
             resave: false,
             saveUninitialized: false,
-            cookie: { secure: false },
+            cookie: {secure: false},
         }),
     );
 
@@ -59,12 +59,14 @@ async function bootstrap() {
             AuthModule,
             UserModule,
             ServiceModule,
+            ResourceModule
         ],
     });
     SwaggerModule.setup('api', app, document);
 
 
-    await app.listen(3000);
+    const port = process.env.PORT || 3000;
+    await app.listen(port);
 }
 
 bootstrap();

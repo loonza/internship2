@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8"/>
     <title>Группы</title>
     <link rel="stylesheet" href="/css/styles.css">
     <style>
@@ -17,28 +17,34 @@
             align-items: center;
             margin-bottom: 20px;
         }
+
         #header h1 {
             margin: 0;
             font-size: 24px;
         }
+
         #header > div {
             display: flex;
             align-items: center;
             gap: 15px;
         }
+
         #search-wrapper {
             position: relative;
             display: inline-block;
         }
+
         #search-input {
             padding: 6px 12px;
             border: 1px solid #ddd;
             border-radius: 4px;
             width: 200px;
         }
+
         .highlight {
             background-color: yellow;
         }
+
         .suggestions {
             position: absolute;
             background: white;
@@ -48,10 +54,12 @@
             z-index: 1000;
             width: 200px;
         }
+
         .suggestion-item {
             padding: 4px 8px;
             cursor: pointer;
         }
+
         .suggestion-item:hover {
             background-color: #f0f0f0;
         }
@@ -60,6 +68,7 @@
             width: 100%;
             border-collapse: collapse;
         }
+
         th {
             text-align: left;
             padding: 8px;
@@ -67,10 +76,12 @@
             font-weight: normal;
             color: #666;
         }
+
         td {
             padding: 8px;
             border-bottom: 1px solid #eee;
         }
+
         .group-detail-panel {
             margin-left: 30px;
             padding: 20px;
@@ -79,14 +90,17 @@
             width: 300px;
             flex-shrink: 0;
         }
+
         .group-detail-panel h3 {
             margin-top: 0;
             color: #666;
             font-size: 16px;
         }
+
         #group-members div {
             margin-bottom: 8px;
         }
+
         #pagination {
             display: flex;
             align-items: center;
@@ -95,31 +109,38 @@
             font-size: 14px;
             padding: 10px 0;
         }
+
         #pagination a {
             color: #0066cc;
             text-decoration: none;
         }
+
         .group-row:hover {
             background-color: #f5f5f5;
             cursor: pointer;
         }
+
         .group-selected {
             background-color: #e6f2ff;
         }
+
         .group-name-link {
             display: block;
             text-decoration: none;
             color: inherit;
             padding: 8px;
         }
+
         .group-name-link:hover {
             text-decoration: underline;
         }
+
         .content-wrapper {
             display: flex;
             flex: 1;
             min-height: 0;
         }
+
         #table-wrapper {
             flex: 1;
             overflow-y: auto;
@@ -132,9 +153,12 @@
     <div id="header">
         <h1>Группы</h1>
         <div>
-            <a href="/groups/add"><button id="add-button">Добавить</button></a>
+            <a href="/groups/add">
+                <button id="add-button">Добавить</button>
+            </a>
             <div id="search-wrapper">
-                <input type="text" id="search-input" placeholder="Найти в списке" autocomplete="off" value="{{searchQuery}}">
+                <input type="text" id="search-input" placeholder="Найти в списке" autocomplete="off"
+                       value="{{searchQuery}}">
                 <div id="suggestions" class="suggestions" hidden></div>
             </div>
         </div>
@@ -188,11 +212,13 @@
 
     <div id="pagination">
         {{#if (gt currentPage 1)}}
-            <a href="?page={{subtract currentPage 1}}&perPage={{perPage}}{{#if searchQuery}}&search={{searchQuery}}{{/if}}">&lt; Предыдущая</a>
+            <a href="?page={{subtract currentPage 1}}&perPage={{perPage}}{{#if searchQuery}}
+            &search={{searchQuery}}{{/if}}">&lt; Предыдущая</a>
         {{/if}}
         <span>Страница {{currentPage}} из {{totalPages}}</span>
         {{#if (lt currentPage totalPages)}}
-            <a href="?page={{add currentPage 1}}&perPage={{perPage}}{{#if searchQuery}}&search={{searchQuery}}{{/if}}">Следующая &gt;</a>
+            <a href="?page={{add currentPage 1}}&perPage={{perPage}}{{#if searchQuery}}
+            &search={{searchQuery}}{{/if}}">Следующая &gt;</a>
         {{/if}}
         <span>На странице:</span>
         <select id="per-page-select" onchange="changePerPage(this.value)">
@@ -231,7 +257,7 @@
 
 
         document.querySelectorAll('.group-row').forEach(row => {
-            row.addEventListener('click', function(e) {
+            row.addEventListener('click', function (e) {
                 if (!e.target.closest('.group-name-link')) {
                     const groupId = this.getAttribute('data-group-id');
                     showGroupMembers(groupId, this);
@@ -277,7 +303,7 @@
             renderTable([group]);
             const row = document.querySelector(`[data-group-id="${group.id}"]`);
             if (row) {
-                row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                row.scrollIntoView({behavior: 'smooth', block: 'nearest'});
                 document.querySelectorAll('.group-row').forEach(r => r.classList.remove('group-selected'));
                 row.classList.add('group-selected');
                 showGroupMembers(group.id, row);
@@ -291,7 +317,7 @@
         }
     });
 
-    searchInput.addEventListener('keypress', function(e) {
+    searchInput.addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {
             const url = new URL(window.location.href);
             url.searchParams.set('search', this.value);
@@ -326,6 +352,7 @@
                     '<div style="color: red;">Ошибка загрузки состава группы</div>';
         }
     }
+
 
     function changePerPage(perPage) {
         const url = new URL(window.location.href);

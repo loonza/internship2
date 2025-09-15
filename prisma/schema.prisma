@@ -25,22 +25,14 @@ model User {
 }
 
 model Group {
-  id          String          @id @default(uuid())
-  name        String
-  description String?
-  source      AuthSource?
-  comment     String?
-  children    GroupRelation[] @relation("ChildGroups")
-  parents     GroupRelation[] @relation("ParentGroups")
-  users       GroupUser[]
-}
-
-model GroupUser {
-  id      String @id @default(uuid())
-  userId  String
-  groupId String
-  group   Group  @relation(fields: [groupId], references: [id])
-  user    User   @relation(fields: [userId], references: [id])
+  id           String          @id @default(uuid())
+  name         String
+  description  String?
+  source       AuthSource?
+  comment      String?
+  childGroups  GroupRelation[] @relation("ChildGroups")
+  parentGroups GroupRelation[] @relation("ParentGroups")
+  users        GroupUser[]
 }
 
 model GroupRelation {
@@ -49,6 +41,14 @@ model GroupRelation {
   childGroupId  String
   childGroup    Group  @relation("ChildGroups", fields: [childGroupId], references: [id])
   parentGroup   Group  @relation("ParentGroups", fields: [parentGroupId], references: [id])
+}
+
+model GroupUser {
+  id      String @id @default(uuid())
+  userId  String
+  groupId String
+  group   Group  @relation(fields: [groupId], references: [id])
+  user    User   @relation(fields: [userId], references: [id])
 }
 
 model Service {
