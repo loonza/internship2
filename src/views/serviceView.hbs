@@ -6,6 +6,9 @@
     <link rel="stylesheet" href="/css/styles.css"/>
     <style>
 
+        .access-section {
+            margin-top: 20px;
+        }
 
         .access-controls {
             display: flex;
@@ -305,6 +308,38 @@
             padding-bottom: 10px;
         }
 
+        .search-container {
+            margin-bottom: 15px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .items-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .item-row {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+
+        .item-row:hover {
+            background-color: #f5f5f5;
+        }
+
+        .item-row.selected {
+            background-color: #e6f2ff;
+        }
 
         .modal-buttons {
             display: flex;
@@ -333,6 +368,9 @@
             background-color: #f5f5f5;
         }
 
+        .access-section {
+            margin-top: 20px;
+        }
 
         .access-controls {
             display: flex;
@@ -463,6 +501,12 @@
             text-decoration: none;
             display: inline-block;
         }
+
+        .no-resources-message a {
+            color: #0066cc;
+            text-decoration: underline;
+        }
+
     </style>
 </head>
 <body>
@@ -519,7 +563,8 @@
             </table>
         </div>
 
-        <div class="tab-section" id="access-tab" style="display:none;">
+    <div class="tab-section" id="access-tab" style="display:none;">
+        {{#if service.resources.length}}
             <div class="access-info">
                 <h3>Текущие права доступа сервиса</h3>
                 <p>Сервис имеет {{selectedAccess.length}} прав доступа, распределенных по {{service.resources.length}}
@@ -534,7 +579,6 @@
                         <th>Источник</th>
                         <th>Тип доступа</th>
                         <th>Название</th>
-                        <th>Действие</th>
                     </tr>
                     </thead>
                     <tbody id="current-access-table">
@@ -544,13 +588,6 @@
                             <td>{{this.source}}</td>
                             <td>{{this.type}}</td>
                             <td>{{this.name}}</td>
-                            <td>
-                                <button class="action-button remove-access-btn"
-                                        data-id="{{this.id}}"
-                                        data-name="{{this.name}}">
-                                    Удалить
-                                </button>
-                            </td>
                         </tr>
                     {{else}}
                         <tr>
@@ -624,34 +661,43 @@
                 <button id="save-access-btn" class="submit-button">Сохранить права доступа</button>
             </div>
         </div>
-
-
-        <div class="tab-section" id="props-tab" style="display:none;">
-            <form id="service-form" class="form-grid">
-                <div class="form-group">
-                    <label>Название сервиса</label>
-                    <input type="text" name="name" value="{{service.name}}" required>
-                </div>
-                <div class="form-group">
-                    <label>Статус</label>
-                    <div>
-                        <label>
-                            <input type="checkbox" name="enabled" {{#if service.enabled}}checked{{/if}}>
-                            Сервис активен
-                        </label>
-                    </div>
-                </div>
-                <div class="form-group" style="grid-column: 1 / -1;">
-                    <label>Описание</label>
-                    <textarea name="description">{{service.description}}</textarea>
-                </div>
-                <div style="display:flex; justify-content: space-between; grid-column: 1 / -1;">
-                    <button type="button" id="delete-button" class="delete-button">Удалить сервис</button>
-                    <button type="submit" class="submit-button">Сохранить</button>
-                </div>
-            </form>
-        </div>
+        {{else}}
+            <div class="no-resources-message">
+                <h3>Нет ресурсов для добавления прав доступа</h3>
+                <p>Для добавления прав доступа к сервису необходимо сначала создать хотя бы один ресурс.</p>
+                <p>Перейдите на вкладку <a href="#" onclick="switchToResourcesTab()">"Ресурсы"</a> и создайте ресурс.
+                </p>
+            </div>
+        {{/if}}
     </div>
+
+
+    <div class="tab-section" id="props-tab" style="display:none;">
+        <form id="service-form" class="form-grid">
+            <div class="form-group">
+                <label>Название сервиса</label>
+                <input type="text" name="name" value="{{service.name}}" required>
+            </div>
+            <div class="form-group">
+                <label>Статус</label>
+                <div>
+                    <label>
+                        <input type="checkbox" name="enabled" {{#if service.enabled}}checked{{/if}}>
+                        Сервис активен
+                    </label>
+                </div>
+            </div>
+            <div class="form-group" style="grid-column: 1 / -1;">
+                <label>Описание</label>
+                <textarea name="description">{{service.description}}</textarea>
+            </div>
+            <div style="display:flex; justify-content: space-between; grid-column: 1 / -1;">
+                <button type="button" id="delete-button" class="delete-button">Удалить сервис</button>
+                <button type="submit" class="submit-button">Сохранить</button>
+            </div>
+        </form>
+    </div>
+</div>
 </div>
 
 
@@ -981,7 +1027,7 @@
 
             for (const resource of resources) {
                 try {
-                    const response = await fetch('/api/resources/save', {
+                    const response = await fetch('/resources/save', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -1024,6 +1070,18 @@
     document.querySelector('[data-tab="access"]').addEventListener('click', function () {
         setTimeout(loadAccessList, 100);
     });
+
+    function switchToResourcesTab() {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelector('[data-tab="resources"]').classList.add('active');
+
+        document.querySelectorAll('.tab-section').forEach(section => {
+            section.style.display = 'none';
+        });
+
+        document.getElementById('resources-tab').style.display = 'block';
+    }
+
 </script>
 </body>
 </html>

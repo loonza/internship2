@@ -1,4 +1,4 @@
-import {Controller, Get, Query} from '@nestjs/common';
+import {Controller, Delete, Get, Param, Query} from '@nestjs/common';
 import {PrismaService} from '../prisma.service';
 import {ApiExcludeController} from '@nestjs/swagger';
 
@@ -44,5 +44,20 @@ export class AccessController {
             'internal': 'Внутренний'
         };
         return mapping[type] || type;
+    }
+    @Delete(':id')
+    async deleteAccess(@Param('id') id: string) {
+        try {
+            console.log(id);
+
+            await this.prisma.resourceAccess.delete({
+                where: { id }
+            });
+
+            return { success: true };
+        } catch (error) {
+            console.error('Delete access error:', error);
+            throw new Error('Ошибка при удалении доступа');
+        }
     }
 }

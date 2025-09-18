@@ -96,9 +96,18 @@ export class UserService {
     }
 
     async deleteUser(id: string) {
-        return this.prisma.user.delete({
-            where: {id}
-        });
+        try {
+            await this.prisma.groupUser.deleteMany({
+                where: { userId: id }
+            });
+
+            return await this.prisma.user.delete({
+                where: { id }
+            });
+        } catch (error) {
+            console.error('Error deleting user:', error);
+            throw error;
+        }
     }
 
     async getUserAccessRights(userId: string) {

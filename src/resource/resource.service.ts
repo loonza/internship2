@@ -52,10 +52,24 @@ export class ResourceService {
     }
 
     async removeAccess(id: string) {
-        await this.prisma.resourceAccess.deleteMany({
-            where: {accessId: id}
-        });
-        return {success: true};
+        try {
+            const access = await this.prisma.access.findUnique({
+                where: { id }
+            });
+
+            if (!access) {
+                throw new Error('Доступ не найден');
+            }
+
+            await this.prisma.resourceAccess.deleteMany({
+                where: { accessId: id }
+            });
+
+            return { success: true };
+        } catch (error) {
+            console.error('Error removing access:', error);
+            throw new Error('Ошибка при удалении доступа');
+        }
     }
 
     async saveAccess(resourceId: string, accessIds: string[]) {
@@ -109,14 +123,21 @@ export class ResourceService {
     }
 
     async deleteResource(id: string) {
-
-        await this.prisma.resourceAccess.deleteMany({
-            where: {resourceId: id}
+        const resource = await this.prisma.resource.findUnique({
+            where: { id },
+            include: { ResourceAccess: true }
         });
 
+        if (!resource) {
+            throw new Error('Ресурс не найден');
+        }
+
+        await this.prisma.resourceAccess.deleteMany({
+            where: { resourceId: id }
+        });
 
         return this.prisma.resource.delete({
-            where: {id}
+            where: { id }
         });
     }
 
@@ -159,5 +180,20 @@ export class ResourceService {
             }
         });
     }
-
+    async removeResourceAccess(resourceId: string, accessId: string) {
+        try {
+            await this.prisma.resourceAccess.delete({
+                where: {
+                    resourceId_accessId: {
+                        resourceId,
+                        accessId
+                    }
+                }
+            });
+            return { success: true };
+        } catch (error) {
+            console.error('Error removing resource access:', error);
+            throw new Error('Ошибка при удалении связи доступ-ресурс');
+        }
+    }
 }

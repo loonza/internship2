@@ -78,13 +78,29 @@ export class ServiceService {
     }
 
     async deleteService(id: string) {
+        const resources = await this.prisma.resource.findMany({
+            where: {serviceId: id},
+            select: {id: true}
+        });
+
+        const resourceIds = resources.map(r => r.id);
+
+        if (resourceIds.length > 0) {
+            await this.prisma.resourceAccess.deleteMany({
+                where: {resourceId: {in: resourceIds}}
+            });
+        }
+
+
         await this.prisma.resource.deleteMany({
             where: {serviceId: id}
         });
 
+
         return this.prisma.service.delete({
             where: {id}
         });
+
     }
 
 
